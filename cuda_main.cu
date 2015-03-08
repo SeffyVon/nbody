@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     glutInitWindowPosition(50, 25);
 
     //Configure Window Size
-    glutInitWindowSize(480,480);
+    glutInitWindowSize(800,600);
 
     //Create Window
     glutCreateWindow("NBody Simulation - Little Hamster and Sheep");
@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
 
     //Call to the drawing function
     glutDisplayFunc(draw);
+    glutTimerFunc(1000,timerFunc,10);
 
 
     init();

@@ -22,7 +22,7 @@ void initGL()
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     /*void glOrtho(GLdouble  left,  GLdouble  right,  GLdouble  bottom,  GLdouble  top,  GLdouble  nearVal,  GLdouble  farVal);*/
-    glOrtho(0, 640, 480, 0, -100, 100);
+    glOrtho(-400, 400, -300, 300, -100, 100);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -55,10 +55,10 @@ void updateAcceleration(Body &body)
 }
 */
 __device__
-void updateVelocity(Body &body, float3 delta_a)
+void updateVelocity(Body &body, float3 cur_a)
 {
-	body.v.x += (body.a.x + delta_a.x) * TIME_STEP / 2;
-	body.v.y += (body.a.y + delta_a.y) * TIME_STEP/ 2;
+	body.v.x += (body.a.x + cur_a.x ) / 2 * TIME_STEP;
+	body.v.y += (body.a.y + cur_a.y ) / 2 * TIME_STEP;
 }
 
 __device__
@@ -69,7 +69,7 @@ void updatePosition(Body &body)
 }
 
 __device__
-void bodyBodyInteraction(Body self, Body other, float3 &delta_a)
+void bodyBodyInteraction(Body self, Body other, float3 &cur_a)
 {
 	float3 dist3;
 	dist3.x = other.pos.x - self.pos.x;
@@ -79,8 +79,8 @@ void bodyBodyInteraction(Body self, Body other, float3 &delta_a)
 	float dist_six = dist_sqr * dist_sqr * dist_sqr;
 	float dist_cub = sqrtf(dist_six);
 
-	delta_a.x += (other.mass * dist3.x) / dist_cub;
-	delta_a.y += (other.mass * dist3.y) / dist_cub;
+	cur_a.x += (other.mass * dist3.x) / dist_cub;
+	cur_a.y += (other.mass * dist3.y) / dist_cub;
 
 }
 
@@ -90,25 +90,26 @@ void nbody(Body *body)
 	int idx = blockIdx.x * BLOCK_SIZE + threadIdx.x;
 	if(idx < N_SIZE)
 	{
-		float3 delta_a;
-		delta_a.x = 0.0f;
-		delta_a.y = 0.0f;
+		float3 cur_a;
+		cur_a.x = 0.0f;
+		cur_a.y = 0.0f;
 
 		for(int i = 0; i < N_SIZE; i++){
 			if( i != idx )
-				bodyBodyInteraction(body[idx], body[i], delta_a);
+				bodyBodyInteraction(body[idx], body[i], cur_a);
 		}
 
-		delta_a.x *= GRAVITY;
-		delta_a.y *= GRAVITY;
-			
-		updateVelocity(body[idx], delta_a);
-
+		cur_a.x *= GRAVITY;
+		cur_a.y *= GRAVITY;
+		
 		updatePosition(body[idx]);
+		updateVelocity(body[idx], cur_a);
 
 
-		body[idx].a.x += delta_a.x;
-		body[idx].a.y += delta_a.y;
+
+
+		body[idx].a.x = cur_a.x;
+		body[idx].a.y = cur_a.y;
 
 	}
 }
@@ -126,9 +127,9 @@ int runKernelNBodySimulation()
 
 	for(int i = 0; i < N_SIZE; i++)
 	{
-		printf("a[%d]=(%f,%f) ", i, bodies[i].a.x, bodies[i].a.y);
+		//printf("a[%d]=(%f,%f) ", i, bodies[i].a.x, bodies[i].a.y);
 		//printf("v[%d]=(%f,%f)\n", i, bodies[i].v.x, bodies[i].v.y);
-		printf("pos[%d]=(%f,%f)\n", i, bodies[i].pos.x, bodies[i].pos.y);
+		//printf("pos[%d]=(%f,%f)\n", i, bodies[i].pos.x, bodies[i].pos.y);
 	}
 
 	// Unmap the buffer

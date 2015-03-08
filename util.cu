@@ -3,6 +3,13 @@
 
 
 extern Body bodies[N_SIZE];
+
+void timerFunc(int value)
+{
+     glutPostRedisplay();
+    glutTimerFunc (5, timerFunc, 10);
+    
+}
  
 //utility functions definitions go here
 void draw() {
@@ -28,12 +35,12 @@ void draw() {
     glFlush();
     
     //Draw stuff
-    for(int i = 0; i < N_SIZE; i++){
-		printf("HOHO a=(%f,%f,%f)\n", bodies[i].a.x, bodies[i].a.y, bodies[i].a.z);
-	}
+   // for(int i = 0; i < N_SIZE; i++){
+	//	printf("HOHO a=(%f,%f,%f)\n", bodies[i].pos.x, bodies[i].pos.y, bodies[i].pos.z);
+	//}
 
 
-    //glutPostRedisplay();
+  // glutPostRedisplay();
 
 }
 

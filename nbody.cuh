@@ -13,11 +13,11 @@
 
 #include <cuda_gl_interop.h>
 
-#define N_SIZE 10
+#define N_SIZE 1000
 #define BLOCK_SIZE 1024
-#define GRID_SIZE 1
+#define GRID_SIZE 10
 
-#define GRAVITY 9.81f
+#define GRAVITY 0.667 //9.81f
 #define EPSILON2 0.01f // epsilon ^ 2
 #define TIME_STEP 0.01f
 
@@ -29,10 +29,18 @@ struct Body {
 	float mass; // mass
 
 	Body() {
-		pos.x = pos.y = pos.z = 1.0f;
-		a.x = a.y = a.z = 0.0f;
-		v.x = v.y = v.z = 0.0f;
-		mass = 1.0f;
+		pos.x = -320 + ((float)rand()/(float)(RAND_MAX)) * 640;
+		pos.y =-240 + ((float)rand()/(float)(RAND_MAX)) * 480;
+		pos.z = 0.0f ;
+		a.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+		a.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+		a.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+
+		v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+		v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+		v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+
+		mass = ((float)rand()/(float)(RAND_MAX)) * 500;
 	}
 
 	Body(float x, float y, float z, float mass){
