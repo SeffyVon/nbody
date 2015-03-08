@@ -1,10 +1,16 @@
 #ifndef _NBODY_
 #define _NBODY_
 
+
 #include <stdio.h>
 #include <vector_types.h>
 #include <cstdlib>
 
+#define GL_GLEXT_PROTOTYPES
+
+#include <GL/glut.h>
+
+#include <cuda_gl_interop.h>
 
 #define N_SIZE 10
 #define BLOCK_SIZE 1024
@@ -39,15 +45,18 @@ struct Body {
 extern int bodies_size;
 extern Body *bodies_dev;
 extern Body bodies[N_SIZE];
+extern GLuint vertexArray;
  
 
 
 
 void init();
+void deinit();
+
 
 void initCUDA();
+void initGL();
 
-void deinit();
 
 int runKernelNBodySimulation();
 
