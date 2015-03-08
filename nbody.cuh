@@ -4,11 +4,16 @@
 #include <stdio.h>
 #include <vector_types.h>
 #include <cstdlib>
+#include <cmath>
 
 
 #define N_SIZE 10
 #define BLOCK_SIZE 1024
 #define GRID_SIZE 1
+
+#define GRAVITY 9.81f
+#define EPSILON2 0.01f // epsilon ^ 2
+#define TIME_STEP 0.01f
 
 
 struct Body {
@@ -51,8 +56,9 @@ void deinit();
 
 int runKernelNBodySimulation();
 
-__device__ 
-void updateAcceleration(Body &body);
+//__device__ 
+//void updateAcceleration(Body &body);
+
 __device__
 void updateVelocity(Body &body);
 
@@ -62,5 +68,6 @@ void updatePosition(Body &body);
 __global__ 
 void nbody(Body *body);
 
-
+__device__
+void bodyBodyInteraction(Body& self, Body other);
 #endif
