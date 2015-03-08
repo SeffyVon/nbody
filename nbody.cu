@@ -14,6 +14,7 @@ GLuint vertexArray;
 
 
 
+
 void readFromFile2()
 {
 	int i = 0;
@@ -21,15 +22,22 @@ void readFromFile2()
 	FILE* f_sample = fopen("dubinski.tab","r");
 	double mass;
 	double x, y, z, vx, vy, vz;
+	int j = 0;
 	while ( i < N_SIZE && fscanf( f_sample, "%lf %lf %lf %lf %lf %lf %lf", &mass, &x, &y, &z, &vx, &vy, &vz )>0 ){ // the ith element will store in the sample[i+head_blocks_size]
-	    bodies[i].mass = (float)mass;
-	    bodies[i].pos.x = (float)x;
-	    bodies[i].pos.y = (float)y;
-	    bodies[i].pos.z = (float)z;
-	    bodies[i].v.x = (float)vx;
-	    bodies[i].v.y =(float) vy;
-	    bodies[i].v.z = (float)vz;
-	    i++;
+	    
+		if( j < 1024|| j > 32768 && j < 32768+512 || j > (32768 + 16384) ){
+
+		    bodies[i].mass = (float)mass*10;
+		    bodies[i].pos.x = (float)x;
+		    bodies[i].pos.y = (float)y;
+		    bodies[i].pos.z = (float)z;
+		    bodies[i].v.x = (float)vx*5;
+		    bodies[i].v.y =(float) vy*5;
+		    bodies[i].v.z = (float)vz*5;
+		    i++;
+		}
+		j++;
+
   }
   fclose(f_sample);
 }
@@ -51,14 +59,24 @@ void initGL()
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     /*void glOrtho(GLdouble  left,  GLdouble  right,  GLdouble  bottom,  GLdouble  top,  GLdouble  nearVal,  GLdouble  farVal);*/
-    glOrtho(-WINDOW_W/2, WINDOW_W/2, -WINDOW_H/2, WINDOW_H/2, -100, 100);
-
+    if( ORTHO_VERSION )
+    {
+    	glOrtho(-WINDOW_W/2, WINDOW_W/2, -WINDOW_H/2, WINDOW_H/2, -100, 100);
+    }
+    else
+    {
+    	gluPerspective (50.0*50, (float)WINDOW_W/(float)WINDOW_H, 0, 1000);
+    }
+   
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
+    if( !ORTHO_VERSION )
+   		 gluLookAt(-200,100,-500,0,0,0,0,1,0);
 	//glGenBuffers(1,&vertexArray);
 	//glBindBuffer(GL_ARRAY_BUFFER, vertexArray);
 	//glBufferData(GL_ARRAY_BUFFER, N_SIZE*sizeof(Body), bodies, GL_DYNAMIC_COPY);
+
+	//glEnable(GL_DEPTH_TEST);
 	
 }
 
@@ -88,13 +106,15 @@ void updateVelocity(Body &body, float3 cur_a)
 {
 	body.v.x += (body.a.x + cur_a.x ) / 2 * TIME_STEP;
 	body.v.y += (body.a.y + cur_a.y ) / 2 * TIME_STEP;
+	body.v.z += (body.a.z + cur_a.z ) / 2 * TIME_STEP;
 }
 
 __device__
 void updatePosition(Body &body)
 {
-	body.pos.x += body.v.x * TIME_STEP; //+ body.a.x * TIME_STEP * TIME_STEP /2;
-	body.pos.y += body.v.y * TIME_STEP; //+ body.a.y * TIME_STEP * TIME_STEP /2;
+	body.pos.x += body.v.x * TIME_STEP + body.a.x * TIME_STEP * TIME_STEP /2;
+	body.pos.y += body.v.y * TIME_STEP + body.a.y * TIME_STEP * TIME_STEP /2;
+	body.pos.z += body.v.z * TIME_STEP + body.a.z * TIME_STEP * TIME_STEP /2;
 }
 
 __device__
@@ -103,13 +123,16 @@ void bodyBodyInteraction(Body self, Body other, float3 &cur_a)
 	float3 dist3;
 	dist3.x = other.pos.x - self.pos.x;
 	dist3.y = other.pos.y - self.pos.y;
+	dist3.z = other.pos.z - self.pos.z;
 
-	float dist_sqr = dist3.x * dist3.x + dist3.y * dist3.y + EPSILON2; 
+
+	float dist_sqr = dist3.x * dist3.x + dist3.y * dist3.y + dist3.z * dist3.z + EPSILON2; 
 	float dist_six = dist_sqr * dist_sqr * dist_sqr;
 	float dist_cub = sqrtf(dist_six);
 
 	cur_a.x += (other.mass * dist3.x) / dist_cub;
 	cur_a.y += (other.mass * dist3.y) / dist_cub;
+	cur_a.z += (other.mass * dist3.z) / dist_cub;
 
 }
 
@@ -122,6 +145,7 @@ void nbody(Body *body)
 		float3 cur_a;
 		cur_a.x = 0.0f;
 		cur_a.y = 0.0f;
+		cur_a.z = 0.0f;
 
 		for(int i = 0; i < N_SIZE; i++){
 			if( i != idx )
@@ -130,6 +154,7 @@ void nbody(Body *body)
 
 		cur_a.x *= GRAVITY;
 		cur_a.y *= GRAVITY;
+		cur_a.z *= GRAVITY;
 		
 		updatePosition(body[idx]);
 		updateVelocity(body[idx], cur_a);
@@ -139,6 +164,10 @@ void nbody(Body *body)
 
 		body[idx].a.x = cur_a.x;
 		body[idx].a.y = cur_a.y;
+		body[idx].a.z = cur_a.z;
+		
+		
+
 
 	}
 }

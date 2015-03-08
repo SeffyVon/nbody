@@ -29,7 +29,9 @@ int main(int argc, char **argv) {
 
     //Call to the drawing function
     glutDisplayFunc(draw);
-    glutTimerFunc(1000,timerFunc,10);
+    //glutTimerFunc(1000,timerFunc,10);
+
+    glutKeyboardFunc(keyboardFunc);
 
 
     init();

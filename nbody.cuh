@@ -13,11 +13,12 @@
 
 #include <cuda_gl_interop.h>
 
+#define ORTHO_VERSION 1
 
 #define WINDOW_W 1024
 #define WINDOW_H 768
 
-#define N_SIZE 1000
+#define N_SIZE 2560
 #define BLOCK_SIZE 1024
 #define GRID_SIZE 1000
 
@@ -63,8 +64,8 @@ extern int bodies_size;
 extern Body *bodies_dev;
 extern Body bodies[N_SIZE];
 extern GLuint vertexArray;
+extern float cx,cy,cz;
  
-
 
 
 void init();
