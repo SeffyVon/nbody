@@ -1,8 +1,14 @@
 #include "util.cuh"
 #include "nbody.cuh"
+#include <iostream>
+#include <fstream>
+extern Body bodies[N_SIZE];
+
 
 //Main program
 int main(int argc, char **argv) {
+
+
 
     glutInit(&argc, argv);
 

@@ -1,18 +1,47 @@
 
 #include "nbody.cuh"
+#include <iostream>
+#include <fstream>
+
+
 
 int bodies_size = 0;
 Body *bodies_dev = NULL;
 
-Body bodies[N_SIZE] =  {  Body(1,0,0,1), Body(13,2,0,1),  Body(8,3,0,1), Body(2,7,0,1), Body(7,2,0,1), Body(9,2,0,1),  Body(4,3,0,1), Body(2,4,0,1) };
+Body bodies[N_SIZE];// {  Body(0,0,0,1000000), Body(13,2,0,1),  Body(8,3,0,1), Body(2,7,0,1), Body(7,2,0,1), Body(9,2,0,1),  Body(4,3,0,1), Body(2,4,0,1) };
 GLuint vertexArray;
 
 
+
+
+void readFromFile2()
+{
+	int i = 0;
+
+	FILE* f_sample = fopen("dubinski.tab","r");
+	double mass;
+	double x, y, z, vx, vy, vz;
+	while ( i < N_SIZE && fscanf( f_sample, "%lf %lf %lf %lf %lf %lf %lf", &mass, &x, &y, &z, &vx, &vy, &vz )>0 ){ // the ith element will store in the sample[i+head_blocks_size]
+	    bodies[i].mass = (float)mass;
+	    bodies[i].pos.x = (float)x;
+	    bodies[i].pos.y = (float)y;
+	    bodies[i].pos.z = (float)z;
+	    bodies[i].v.x = (float)vx;
+	    bodies[i].v.y =(float) vy;
+	    bodies[i].v.z = (float)vz;
+	    i++;
+  }
+  fclose(f_sample);
+}
+
 void initCUDA()
 {
+
+	readFromFile2();
 	bodies_size = N_SIZE * sizeof(Body);
 	cudaMalloc( (void**)&bodies_dev, bodies_size ); 
 	cudaMemcpy( bodies_dev, bodies, bodies_size, cudaMemcpyHostToDevice );
+
 	//cudaGLRegisterBufferObject(vertexArray);
 
 }

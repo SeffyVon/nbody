@@ -13,9 +13,9 @@
 
 #include <cuda_gl_interop.h>
 
-#define N_SIZE 1000
+#define N_SIZE 8000//81920
 #define BLOCK_SIZE 1024
-#define GRID_SIZE 10
+#define GRID_SIZE 1000
 
 #define GRAVITY 0.667 //9.81f
 #define EPSILON2 0.01f // epsilon ^ 2
