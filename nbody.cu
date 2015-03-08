@@ -22,7 +22,7 @@ void initGL()
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     /*void glOrtho(GLdouble  left,  GLdouble  right,  GLdouble  bottom,  GLdouble  top,  GLdouble  nearVal,  GLdouble  farVal);*/
-    glOrtho(-400, 400, -300, 300, -100, 100);
+    glOrtho(-WINDOW_W/2, WINDOW_W/2, -WINDOW_H/2, WINDOW_H/2, -100, 100);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -64,8 +64,8 @@ void updateVelocity(Body &body, float3 cur_a)
 __device__
 void updatePosition(Body &body)
 {
-	body.pos.x += body.v.x * TIME_STEP + body.a.x * TIME_STEP * TIME_STEP /2;
-	body.pos.y += body.v.y * TIME_STEP + body.a.y * TIME_STEP * TIME_STEP /2;
+	body.pos.x += body.v.x * TIME_STEP; //+ body.a.x * TIME_STEP * TIME_STEP /2;
+	body.pos.y += body.v.y * TIME_STEP; //+ body.a.y * TIME_STEP * TIME_STEP /2;
 }
 
 __device__

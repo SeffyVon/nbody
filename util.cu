@@ -6,8 +6,8 @@ extern Body bodies[N_SIZE];
 
 void timerFunc(int value)
 {
-     glutPostRedisplay();
-    glutTimerFunc (5, timerFunc, 10);
+    glutPostRedisplay();
+    //glutTimerFunc (5, timerFunc, 10);
     
 }
  
@@ -15,7 +15,7 @@ void timerFunc(int value)
 void draw() {
 
     // Black background
-    glClearColor(1.0f,1.0f,1.0f,1.0f);
+    glClearColor(0.7f,0.7f,0.7f,0.7f);
     glClear(GL_COLOR_BUFFER_BIT);
 
 
@@ -26,13 +26,13 @@ void draw() {
     glEnableClientState( GL_VERTEX_ARRAY );
     glEnableClientState( GL_COLOR_ARRAY );
     glVertexPointer( 2, GL_FLOAT, sizeof(Body), &bodies[0].pos.x );
-    glColorPointer( 3, GL_UNSIGNED_BYTE, sizeof(Body), &bodies[0].v.x );
+    glColorPointer( 4, GL_UNSIGNED_BYTE, sizeof(Body), &bodies[0].mass );
     glPointSize( 5.0 );
     glDrawArrays( GL_POINTS, 0, N_SIZE );
     glDisableClientState( GL_VERTEX_ARRAY );
     glDisableClientState( GL_COLOR_ARRAY );
 
-    glFlush();
+   	glutSwapBuffers();
     
     //Draw stuff
    // for(int i = 0; i < N_SIZE; i++){
@@ -40,7 +40,7 @@ void draw() {
 	//}
 
 
-  // glutPostRedisplay();
+   glutPostRedisplay();
 
 }
 

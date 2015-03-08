@@ -4,18 +4,20 @@
 //Main program
 int main(int argc, char **argv) {
 
+    srand(time(NULL));
+
     glutInit(&argc, argv);
 
     /*Setting up  The Display
     /    -RGB color model + Alpha Channel = GLUT_RGBA
     */
-    glutInitDisplayMode(GLUT_RGBA|GLUT_SINGLE);
+    glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE);
 
     //Configure Window Postion
     glutInitWindowPosition(50, 25);
 
     //Configure Window Size
-    glutInitWindowSize(800,600);
+    glutInitWindowSize(WINDOW_W,WINDOW_H);
 
     //Create Window
     glutCreateWindow("NBody Simulation - Little Hamster and Sheep");
