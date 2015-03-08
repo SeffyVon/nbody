@@ -1,35 +1,68 @@
 
 #include "nbody.cuh"
 
+int bodies_size = 0;
+Body *bodies_dev = NULL;
+Body bodies[N_SIZE] =  {  Body(1,0,4,4), Body(13,2,0,1),  Body(8,3,4,2), Body(2,7,3,2), Body(1,2,0,4), Body(3,2,0,3),  Body(4,3,4,2), Body(2,4,3,2) };
 
-__global__ void hello(char *a, int *b) 
+
+void initCUDA()
 {
-	a[threadIdx.x] += b[threadIdx.x];
+	bodies_size = N_SIZE * sizeof(Body);
+	cudaMalloc( (void**)&bodies_dev, bodies_size ); 
+	cudaMemcpy( bodies_dev, bodies, bodies_size, cudaMemcpyHostToDevice );
 }
 
-int ComputeNextFrameNBodySimlation()
+void init()
 {
-	char a[N] = "Hello \0\0\0\0\0\0";
-	int b[N] = {15, 10, 6, 0, -11, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	initCUDA();
+	atexit(deinit);
+}
+
+void deinit()
+{
+	cudaFree( bodies_dev );
+}
+
+__device__ 
+void updateAcceleration(Body &body){
+	body.a.x ++;
+	body.a.y ++;
+	body.a.z ++;
+}
+
+__device__
+void updateVelocity(Body &body){
+	body.v.x += body.a.x;
+	body.v.y += body.a.y;
+	body.v.z += body.a.z;
+}
+
+__device__
+void updatePosition(Body &body){
+	body.pos.x += body.v.x;
+	body.pos.y += body.v.y;
+	body.pos.z += body.v.z;
+}
  
-	char *ad;
-	int *bd;
-	const int csize = N*sizeof(char);
-	const int isize = N*sizeof(int);
- 
-	cudaMalloc( (void**)&ad, csize ); 
-	cudaMalloc( (void**)&bd, isize ); 
-	cudaMemcpy( ad, a, csize, cudaMemcpyHostToDevice ); 
-	cudaMemcpy( bd, b, isize, cudaMemcpyHostToDevice ); 
+__global__ 
+void nbody(Body *body) 
+{
+	updateAcceleration(body[threadIdx.x]);
+	updateVelocity(body[threadIdx.x]);
+	updatePosition(body[threadIdx.x]);
+}
+
+int runKernelNBodySimulation()
+{
+
+	nbody<<<GRID_SIZE, BLOCK_SIZE>>>(bodies_dev);
+	cudaMemcpy( bodies, bodies_dev, bodies_size, cudaMemcpyDeviceToHost ); 
+
+	for(int i = 0; i < N_SIZE; i++){
+		printf("a=(%f,%f,%f)\n", bodies[i].a.x, bodies[i].a.y, bodies[i].a.z);
+	}
 	
-	dim3 dimBlock( blocksize, 1 );
-	dim3 dimGrid( 1, 1 );
-	hello<<<dimGrid, dimBlock>>>(ad, bd);
-	cudaMemcpy( a, ad, csize, cudaMemcpyDeviceToHost ); 
-	cudaFree( ad );
-	cudaFree( bd );
-	
-	printf("%s\n", a);
 
 	return EXIT_SUCCESS;
 }

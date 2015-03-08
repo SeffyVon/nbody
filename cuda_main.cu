@@ -5,7 +5,7 @@
 
 #include <GL/glut.h>
 #include "util.cuh"
- 
+#include "nbody.cuh"
 
 //Main program
 int main(int argc, char **argv) {
@@ -30,7 +30,12 @@ int main(int argc, char **argv) {
     //Call to the drawing function
     glutDisplayFunc(draw);
 
+
+    init();
+
     // Loop require by OpenGL
     glutMainLoop();
+
+
     return 0;
 }
