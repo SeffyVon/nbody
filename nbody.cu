@@ -47,7 +47,6 @@ void deinit()
 
 /*
 __device__ 
-<<<<<<< HEAD
 void updateAcceleration(Body &body)
 {
 	body.a.x += a.x;
@@ -82,26 +81,7 @@ void bodyBodyInteraction(Body self, Body other, float3 &delta_a)
 
 	delta_a.x += (other.mass * dist3.x) / dist_cub;
 	delta_a.y += (other.mass * dist3.y) / dist_cub;
-=======
-void updateAcceleration(Body &body){
-	body.a.x ++;
-	body.a.y ++;
-	//body.a.z ++;
-}
 
-__device__
-void updateVelocity(Body &body){
-	body.v.x += body.a.x;
-	body.v.y += body.a.y;
-	//body.v.z += body.a.z;
-}
-
-__device__
-void updatePosition(Body &body){
-	body.pos.x += body.v.x;
-	body.pos.y += body.v.y;
-	//body.pos.z += body.v.z;
->>>>>>> e20656691d508a7146bd9e1d0a1361a89bb15087
 }
 
 __global__ 
@@ -143,14 +123,14 @@ int runKernelNBodySimulation()
 
 	cudaMemcpy( bodies, bodies_dev, bodies_size, cudaMemcpyDeviceToHost ); 
 
-<<<<<<< HEAD
+
 	for(int i = 0; i < N_SIZE; i++)
 	{
 		printf("a[%d]=(%f,%f) ", i, bodies[i].a.x, bodies[i].a.y);
 		//printf("v[%d]=(%f,%f)\n", i, bodies[i].v.x, bodies[i].v.y);
 		printf("pos[%d]=(%f,%f)\n", i, bodies[i].pos.x, bodies[i].pos.y);
 	}
-=======
+
 	// Unmap the buffer
 	//cudaGLUnmapbufferObject(vertexArray);
 	
@@ -158,7 +138,7 @@ int runKernelNBodySimulation()
 	for(int i = 0; i < N_SIZE; i++){
 		printf("a=(%f,%f,%f)\n", bodies[i].a.x, bodies[i].a.y, bodies[i].a.z);
 	}*/
->>>>>>> e20656691d508a7146bd9e1d0a1361a89bb15087
+
 	
 
 	return EXIT_SUCCESS;
