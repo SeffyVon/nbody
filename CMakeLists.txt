@@ -32,10 +32,15 @@ endif(NOT OPENGL_FOUND)
 # nvcc flags                                                                                                                                                                                               
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
 
-#cuda_compile(HELPER_O cuda_main.cu)
-#cuda_compile(DRIVER_O cuda_main.cu OPTIONS -G)
+
+set(INC util.cuh
+		nbody.cuh
+)
+set(SRC util.cu
+		nbody.cu
+)
 
 
-cuda_add_executable(main cuda_main.cu)
+cuda_add_executable(main cuda_main.cu ${SRC} ${INC} )
 
 target_link_libraries(main ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
