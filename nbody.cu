@@ -8,7 +8,8 @@
 int bodies_size = 0;
 Body *bodies_dev = NULL;
 
-Body bodies[N_SIZE];// {  Body(0,0,0,1000000), Body(13,2,0,1),  Body(8,3,0,1), Body(2,7,0,1), Body(7,2,0,1), Body(9,2,0,1),  Body(4,3,0,1), Body(2,4,0,1) };
+//Body bodies[N_SIZE];// {  Body(0,0,0,1000000), Body(13,2,0,1),  Body(8,3,0,1), Body(2,7,0,1), Body(7,2,0,1), Body(9,2,0,1),  Body(4,3,0,1), Body(2,4,0,1) };
+Body bodies[N_SIZE] = {Body(0, 0, 0, 10000000) , Body(0,100,0,10000000)};
 GLuint vertexArray;
 
 
@@ -45,7 +46,7 @@ void readFromFile2()
 void initCUDA()
 {
 
-	readFromFile2();
+	//readFromFile2();
 	bodies_size = N_SIZE * sizeof(Body);
 	cudaMalloc( (void**)&bodies_dev, bodies_size ); 
 	cudaMemcpy( bodies_dev, bodies, bodies_size, cudaMemcpyHostToDevice );
@@ -118,7 +119,7 @@ void updatePosition(Body &body)
 }
 
 __device__
-void bodyBodyInteraction(Body self, Body other, float3 &cur_a)
+void bodyBodyInteraction(Body &self, Body &other, float3 &cur_a)
 {
 	float3 dist3;
 	dist3.x = other.pos.x - self.pos.x;
@@ -126,7 +127,13 @@ void bodyBodyInteraction(Body self, Body other, float3 &cur_a)
 	dist3.z = other.pos.z - self.pos.z;
 
 
-	float dist_sqr = dist3.x * dist3.x + dist3.y * dist3.y + dist3.z * dist3.z + EPSILON2; 
+	float dist_sqr = dist3.x * dist3.x + dist3.y * dist3.y + dist3.z * dist3.z + EPSILON2;
+
+	// if(dist_sqr < 0.1){
+	// 	self.mass += other.mass;
+	// 	other.mass = 0;
+	// }
+
 	float dist_six = dist_sqr * dist_sqr * dist_sqr;
 	float dist_cub = sqrtf(dist_six);
 
@@ -136,11 +143,12 @@ void bodyBodyInteraction(Body self, Body other, float3 &cur_a)
 
 }
 
+
 __global__ 
 void nbody(Body *body) 
 {
 	int idx = blockIdx.x * BLOCK_SIZE + threadIdx.x;
-	if(idx < N_SIZE)
+	if(idx < N_SIZE && body[idx].mass != 0)
 	{
 		float3 cur_a;
 		cur_a.x = 0.0f;
@@ -148,7 +156,7 @@ void nbody(Body *body)
 		cur_a.z = 0.0f;
 
 		for(int i = 0; i < N_SIZE; i++){
-			if( i != idx )
+			if( i != idx && body[i].mass!= 0 )
 				bodyBodyInteraction(body[idx], body[i], cur_a);
 		}
 
@@ -158,9 +166,6 @@ void nbody(Body *body)
 		
 		updatePosition(body[idx]);
 		updateVelocity(body[idx], cur_a);
-
-
-
 
 		body[idx].a.x = cur_a.x;
 		body[idx].a.y = cur_a.y;

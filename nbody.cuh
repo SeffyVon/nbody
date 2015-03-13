@@ -18,12 +18,13 @@
 #define WINDOW_W 1024
 #define WINDOW_H 768
 
-#define N_SIZE 2560
+#define N_SIZE 2
 #define BLOCK_SIZE 1024
 #define GRID_SIZE 1000
+#define SOFT_FACTOR 0.00125f
 
 #define GRAVITY 0.000667 //9.81f
-#define EPSILON2 0.01f // epsilon ^ 2
+#define EPSILON2 4.930380657631323783822134085449116758237409e-32// epsilon ^ 2
 #define TIME_STEP 0.01f
 
 
