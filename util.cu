@@ -71,7 +71,7 @@ void draw() {
     glEnableClientState( GL_VERTEX_ARRAY );
     glEnableClientState( GL_COLOR_ARRAY );
     glVertexPointer( 3, GL_FLOAT, sizeof(Body), &bodies[0].pos.x );
-    glColorPointer( 4, GL_UNSIGNED_BYTE, sizeof(Body), &bodies[0].mass );
+    glColorPointer( 4, GL_FLOAT, sizeof(Body), &bodies[0].r );
     glPointSize( 5.0 );
     glDrawArrays( GL_POINTS, 0, N_SIZE );
     glDisableClientState( GL_VERTEX_ARRAY );

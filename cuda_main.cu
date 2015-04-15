@@ -26,6 +26,9 @@ int main(int argc, char **argv) {
     //Create Window
     glutCreateWindow("NBody Simulation - Little Hamster and Sheep");
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
+
 
     //Call to the drawing function
     glutDisplayFunc(draw);

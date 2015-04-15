@@ -30,12 +30,15 @@
 #define PI 3.14152926f
 #define DENSITY 100000
 
+
 struct Body {
 	float3 pos; // position
 	float3 a; // acceleration
 	float3 v; // velocity
 	float mass; // mass
-	float radius; 
+	float radius;
+	float r, g, b, alpha; //color
+
 
 	Body() {
 		pos.x = -320 + ((float)rand()/(float)(RAND_MAX)) * 640;
@@ -48,9 +51,16 @@ struct Body {
 		v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 		v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 		v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-		radius = 1;
-		mass = 4/3* PI * radius*radius*radius * DENSITY;
+		radius = 1.0;
+		mass = 4.0/3.0*PI * radius*radius*radius * DENSITY;
+
+		r = ((float)rand()/(float)(RAND_MAX));
+		g = ((float)rand()/(float)(RAND_MAX));
+		b = ((float)rand()/(float)(RAND_MAX));
+		alpha = 1.0f;
+
 	}
+
 
 	Body(float x, float y, float z, float radius){
 		pos.x = x;
@@ -59,7 +69,11 @@ struct Body {
 		a.x = a.y = a.z = 0.0f;
 		v.x = v.y = v.z = 0.0f;
 		this->radius = radius;
-		this->mass = 4/3* PI * radius*radius*radius * DENSITY;
+		this->mass = 4.0/3.0* PI * radius*radius*radius * DENSITY;
+		r = (unsigned char)(((float)rand()/(float)(RAND_MAX))*255);
+		g = (unsigned char)(((float)rand()/(float)(RAND_MAX))*255);
+		b = (unsigned char)(((float)rand()/(float)(RAND_MAX))*255);
+		alpha = 1.0f;
 	}
 
 };

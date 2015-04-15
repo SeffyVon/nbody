@@ -135,6 +135,7 @@ void bodyBodyCollision(Body &self, Body &other, float3 &cur_a)
 //	self.mass += other.mass; 
 //	other.mass = 0; 
 
+
 	/*no merging*/
 	other.v.x = self.v.x;
 	other.v.y = self.v.y;
@@ -190,7 +191,12 @@ void nbody(Body *body)
 		body[idx].a.x = cur_a.x;
 		body[idx].a.y = cur_a.y;
 		body[idx].a.z = cur_a.z;
-		
+
+		//Update alpha value according to the mass (if mass == 0 then alpha is also set to zero, so the body becomes transparent)
+		if( body[idx].mass == 0.0 ){
+			body[idx].alpha = body[idx].mass;
+		}
+
 	}
 }
 
