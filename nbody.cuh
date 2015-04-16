@@ -15,10 +15,10 @@
 
 #define ORTHO_VERSION 1
 
-#define WINDOW_W 1024
-#define WINDOW_H 768
+#define WINDOW_W 1920
+#define WINDOW_H 1080
 
-#define N_SIZE 2000
+#define N_SIZE 10000
 #define BLOCK_SIZE 1024
 #define GRID_SIZE 1000
 #define SOFT_FACTOR 0.00125f
@@ -40,8 +40,8 @@ struct Body {
 
 
 	Body() {
-		pos.x = -320 + ((float)rand()/(float)(RAND_MAX)) * 640;
-		pos.y =-240 + ((float)rand()/(float)(RAND_MAX)) * 480;
+		pos.x = (-WINDOW_W/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_W) * 0.9;
+		pos.y = (-WINDOW_H/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_H) * 0.9;
 		pos.z = 0.0f ;
 		a.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 		a.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
@@ -50,7 +50,7 @@ struct Body {
 		v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 		v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 		v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-		radius = 2.0;
+		radius = ((float)rand()/(float)(RAND_MAX))*3.0;
 		mass = 4.0/3.0*PI * radius*radius*radius * DENSITY;
 
 		r = 0.5f;

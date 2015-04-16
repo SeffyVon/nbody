@@ -101,21 +101,8 @@ void DrawCircle(float cx, float cy, float r, int num_segments) {
 void draw2(){
     glClearColor(0.7f,0.7f,0.7f,0.7f);
     glClear(GL_COLOR_BUFFER_BIT);
-
+    glColor3f(0.5f, 0.0f, 1.0f);
     runKernelNBodySimulation();
-
-    // glEnableClientState( GL_VERTEX_ARRAY );
-    // glEnableClientState( GL_COLOR_ARRAY );
-
-    // glVertexPointer( 3, GL_FLOAT, sizeof(Body), &bodies[0].pos.x );
-    // glColorPointer( 4, GL_FLOAT, sizeof(Body), &bodies[0].r );
-
-    // glPointSize( 5.0 );
-
-    // glDrawArrays( GL_POINTS, 0, N_SIZE );
-
-    // glDisableClientState( GL_VERTEX_ARRAY );
-    // glDisableClientState( GL_COLOR_ARRAY );
 
     for(int i = 0; i < N_SIZE; i ++){
         if(bodies[i].alpha>0)
