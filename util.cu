@@ -62,12 +62,9 @@ void draw() {
     glClearColor(0.7f,0.7f,0.7f,0.7f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    
-
-
     runKernelNBodySimulation();
 
-    glColor3ub( 255, 0, 255 );
+ //  glColor3ub( 255, 0, 255 );
     glEnableClientState( GL_VERTEX_ARRAY );
     glEnableClientState( GL_COLOR_ARRAY );
     glVertexPointer( 3, GL_FLOAT, sizeof(Body), &bodies[0].pos.x );
@@ -88,6 +85,52 @@ void draw() {
    glutPostRedisplay();
 
 }
+
+void DrawCircle(float cx, float cy, float r, int num_segments) {
+    glBegin(GL_LINE_LOOP);
+    for (int ii = 0; ii < num_segments; ii++)   {
+        float theta = 2.0f * PI * float(ii) / float(num_segments);//get the current angle 
+        float x = r * cosf(theta);//calculate the x component 
+        float y = r * sinf(theta);//calculate the y component 
+        glVertex2f(x + cx, y + cy);//output vertex 
+    }
+    glEnd();
+}
+
+
+void draw2(){
+    glClearColor(0.7f,0.7f,0.7f,0.7f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    runKernelNBodySimulation();
+
+    // glEnableClientState( GL_VERTEX_ARRAY );
+    // glEnableClientState( GL_COLOR_ARRAY );
+
+    // glVertexPointer( 3, GL_FLOAT, sizeof(Body), &bodies[0].pos.x );
+    // glColorPointer( 4, GL_FLOAT, sizeof(Body), &bodies[0].r );
+
+    // glPointSize( 5.0 );
+
+    // glDrawArrays( GL_POINTS, 0, N_SIZE );
+
+    // glDisableClientState( GL_VERTEX_ARRAY );
+    // glDisableClientState( GL_COLOR_ARRAY );
+
+    for(int i = 0; i < N_SIZE; i ++){
+        if(bodies[i].alpha>0)
+            DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
+    }
+
+    glutSwapBuffers();
+
+
+    glutPostRedisplay();
+
+}
+
+
+
 
 
  

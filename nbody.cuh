@@ -18,18 +18,17 @@
 #define WINDOW_W 1024
 #define WINDOW_H 768
 
-#define N_SIZE 10
+#define N_SIZE 2000
 #define BLOCK_SIZE 1024
 #define GRID_SIZE 1000
 #define SOFT_FACTOR 0.00125f
 
-#define GRAVITY 0.1//0.000667 //9.81f
+#define GRAVITY 0.01f//0.000667 //9.81f
 //#define EPSILON2 4.930380657631323783822134085449116758237409e-32// epsilon ^ 2
 #define TIME_STEP 0.001f
 //#define DAMPING 0.995f
 #define PI 3.14152926f
 #define DENSITY 100000
-
 
 struct Body {
 	float3 pos; // position
@@ -51,12 +50,12 @@ struct Body {
 		v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 		v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 		v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-		radius = 1.0;
+		radius = 2.0;
 		mass = 4.0/3.0*PI * radius*radius*radius * DENSITY;
 
-		r = ((float)rand()/(float)(RAND_MAX));
-		g = ((float)rand()/(float)(RAND_MAX));
-		b = ((float)rand()/(float)(RAND_MAX));
+		r = 0.5f;
+		g = 1.0f;
+		b = 1.0f;
 		alpha = 1.0f;
 
 	}
@@ -70,9 +69,9 @@ struct Body {
 		v.x = v.y = v.z = 0.0f;
 		this->radius = radius;
 		this->mass = 4.0/3.0* PI * radius*radius*radius * DENSITY;
-		r = (unsigned char)(((float)rand()/(float)(RAND_MAX))*255);
-		g = (unsigned char)(((float)rand()/(float)(RAND_MAX))*255);
-		b = (unsigned char)(((float)rand()/(float)(RAND_MAX))*255);
+		r = ((float)rand()/(float)(RAND_MAX));
+		g = ((float)rand()/(float)(RAND_MAX));
+		b = ((float)rand()/(float)(RAND_MAX));
 		alpha = 1.0f;
 	}
 

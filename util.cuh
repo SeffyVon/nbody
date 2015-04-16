@@ -9,7 +9,7 @@ void timerFunc(int value);
 //utility functions declarations go here
 void draw(void);
 
-
+void draw2(void);
 
 
 #endif
