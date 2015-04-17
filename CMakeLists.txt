@@ -54,4 +54,4 @@ set(SRC util.cu
 
 cuda_add_executable(main cuda_main.cu ${SRC} ${INC} )
 
-target_link_libraries(main ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY})
+target_link_libraries(main ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
