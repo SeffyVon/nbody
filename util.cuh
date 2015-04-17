@@ -6,7 +6,7 @@
 void keyboardFunc(unsigned char key, int x, int y);
 void mouseCallback(int x, int y);
 void resizeCallback(int w, int h);
-
+void PassiveMouseMotion( int x, int y );
 
 void timerFunc(int value);
 //utility functions declarations go here

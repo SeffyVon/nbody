@@ -5,8 +5,18 @@
 
 extern Body bodies[N_SIZE];
 float prevX = WINDOW_W/2, prevY = WINDOW_H/2;
+bool mouseUp = 0;
 
 bool toggleHelp = true;
+
+float lpos[4] = {-0.3,0.0,0.2,0}; //Positioned light
+float light_specular[4] = {1, 0.6, 1, 0};
+GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 0.0 };
+GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 0.0 }; //ambient light intensity
+GLfloat a;
+GLfloat mat_emission[] = {0.3, 0.5, 0.7, 0.0};
+GLfloat mat_specular[] = { 1.0, 0.5, 0.0, 0.0 };
+GLfloat low_shininess[] = { 0.5 };
 
 void timerFunc(int value)
 {
@@ -86,14 +96,24 @@ void keyboardFunc(unsigned char key, int x, int y) {
 
 
 }
+void PassiveMouseMotion( int x, int y ){
+    prevX = x, prevY = y;
 
+}
 void mouseCallback(int x, int y){
 
 
         //camera.phi += (0.5 - (float(x)/WINDOW_W))*M_PI*0.015;
-        //camera.theta += (0.5 - (float(y)/WINDOW_H))*M_PI*0.015; 
-        camera.phi = M_PI + (0.5 - (float(x)/WINDOW_W))*M_PI;
-        camera.theta = (0.5 - (float(y)/WINDOW_H))*M_PI; 
+        //camera.theta += (0.5 - (float(y)/WINDOW_H))*M_PI*0.015;
+
+        
+
+        float velx = (float(x -prevX)/WINDOW_W);
+        float vely = (float(y -prevY)/WINDOW_H);
+        prevX = x;
+        prevY = y;
+        camera.phi += -velx*M_PI*0.9;
+        camera.theta += -vely*M_PI*0.9;
 
 
         //printf("phi: %f theta: %f x: %d y: %d\n",camera.phi, camera.theta, x, y);
@@ -185,7 +205,6 @@ void DrawCircle(float cx, float cy, float r, int num_segments) {
 void drawText(std::string text, float x, float y){
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-
     //glLoadIdentity();
 
     glColor3f(1.0f, 0.0f, 0.0f);//needs to be called before RasterPos
@@ -211,17 +230,30 @@ void draw2(){
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
+    if( !ORTHO_VERSION ) {
+        gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
               camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
               camera.upX,camera.upY,camera.upZ); //Camera up direction
+    }
+    
 
     runKernelNBodySimulation();
 
     if( toggleHelp ){
-        drawText("USAGE INFO", 50,60);
-        drawText("Use keys w, a, s, d to move", 50,50);
-        drawText("Hold mouse+left button to look around", 50,40);
-        drawText("Press h to show/hide this help info", 50,30);
+        if( !ORTHO_VERSION )
+        {
+            drawText("USAGE INFO", 50,60);
+            drawText("Use keys w, a, s, d to move", 50,50);
+            drawText("Hold mouse+left button to look around", 50,40);
+            drawText("Press h to show/hide this help info", 50,30);
+        }
+        else
+        {
+            drawText("USAGE INFO", 50,80);
+            drawText("Use keys w, a, s, d to move", 50,60);
+            drawText("Hold mouse+left button to look around", 50,40);
+            drawText("Press h to show/hide this help info", 50,10);
+        }
     }
     
 
@@ -229,7 +261,7 @@ void draw2(){
     for(int i = 0; i < N_SIZE; i ++){
         if(bodies[i].alpha>0)
         {
-            if( !ORTHO_VERSION) 
+            if( !ORTHO_VERSION ) 
             {
                 glPushMatrix();
                 glTranslatef(bodies[i].pos.x, bodies[i].pos.y,bodies[i].pos.z);
