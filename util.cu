@@ -195,8 +195,10 @@ void draw2(){
                 glutSolidSphere(bodies[i].radius,10,10);
                 glPopMatrix();
             }
+            else{
 
-            //DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
+                DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
+            }
         }
             
             
