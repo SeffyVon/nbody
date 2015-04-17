@@ -8,12 +8,13 @@
 #include <cmath>
 
 #define GL_GLEXT_PROTOTYPES
-
+#include <GL/glew.h>
 #include <GL/glut.h>
+
 
 #include <cuda_gl_interop.h>
 
-#define ORTHO_VERSION 1
+const int ORTHO_VERSION=0;
 
 #define WINDOW_W 1920
 #define WINDOW_H 1080
@@ -23,7 +24,7 @@
 #define GRID_SIZE 1000
 #define SOFT_FACTOR 0.00125f
 
-#define GRAVITY 0.01f//0.000667 //9.81f
+#define GRAVITACIONAL_CONSTANT 0.01f//0.000667 //9.81f
 //#define EPSILON2 4.930380657631323783822134085449116758237409e-32// epsilon ^ 2
 #define TIME_STEP 0.001f
 //#define DAMPING 0.995f
@@ -77,12 +78,32 @@ struct Body {
 
 };
 
+struct Camera {
+    float camX, camY, camZ;
+    float forwardX, forwardY, forwardZ; 
+    float upX, upY, upZ; 
 
+    float theta, phi;
+
+    Camera() {
+        camX = 0, camY = 0, camZ = 200;
+        forwardX = 0, forwardY = 0, forwardZ = -1;
+        upX = 0, upY = 1, upZ = 0;
+
+        theta = 0; phi = M_PI;
+    }
+
+};
+
+
+
+extern Camera camera;
 extern int bodies_size;
 extern Body *bodies_dev;
 extern Body bodies[N_SIZE];
 extern GLuint vertexArray;
 extern float cx,cy,cz;
+
  
 
 

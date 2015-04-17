@@ -28,9 +28,20 @@ if(NOT OPENGL_FOUND)
     message(ERROR " OPENGL not found!")
 endif(NOT OPENGL_FOUND)
 
+#########################################################
+# FIND GLEW
+#########################################################
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+link_directories(${GLEW_LIBRARY_DIRS})
+add_definitions(${GLEW_DEFINITIONS})
+if(NOT GLEW_FOUND)
+    message(ERROR " OPENGL not found!")
+endif(NOT GLEW_FOUND)
+
 
 # nvcc flags                                                                                                                                                                                               
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_30,code=sm_30)
 
 
 set(INC util.cuh
@@ -43,4 +54,4 @@ set(SRC util.cu
 
 cuda_add_executable(main cuda_main.cu ${SRC} ${INC} )
 
-target_link_libraries(main ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+target_link_libraries(main ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLEW_LIBRARY})

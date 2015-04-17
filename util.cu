@@ -12,55 +12,131 @@ void timerFunc(int value)
     
 }
 
-void keyboardFunc(unsigned char key, int x, int y)
-{
-    if( ORTHO_VERSION )
-        return;
+void resizeCallback(int w, int h) {
+    if( ORTHO_VERSION ) return;
+    // Prevent a divide by zero, when window is too short
+    // (you cant make a window of zero width).
+    if(h == 0)
+        h = 1;
+
+    float ratio = 1.0* w / h;
+
+    // Reset the coordinate system before modifying
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
     
+    // Set the viewport to be the entire window
+    glViewport(0, 0, w, h);
+
+    // Set the correct perspective.
+    gluPerspective(45,ratio,1,1000);
+    glMatrixMode(GL_MODELVIEW);
+    
+}
+
+
+void keyboardFunc(unsigned char key, int x, int y) {
+
+    if (key == 27) 
+        exit(0);
+
     float vel = 10;
+    float rightX, rightY, rightZ;
+    printf("forwardX: %f forwardY: %f forwardZ: %f\n",camera.forwardX,camera.forwardY,camera.forwardZ);
+    printf("upX: %f upY: %f upZ: %f\n", camera.upX,camera.upY, camera.upZ);
+    cross(camera.forwardX,camera.forwardY,camera.forwardZ, camera.upX,camera.upY, camera.upZ, rightX, rightY, rightZ);
+    float sizeRight = sqrtf(rightX*rightX + rightY*rightY + rightZ*rightZ);
+    rightX /= sizeRight; rightY /= sizeRight; rightZ /= sizeRight;
+    printf("rightX: %f rightY: %f rightZ: %f\n",rightX, rightY, rightZ);
     if( key == 'w' )
     {
-        cy+=vel;
-    }
-    if( key == 'a' )
-    {
-        cx-=vel;
+        camera.camX += camera.forwardX*vel;
+        camera.camY += camera.forwardY*vel;
+        camera.camZ += camera.forwardZ*vel;
     }
     if( key == 's' )
     {
-        cy-=vel;
+        camera.camX -= camera.forwardX*vel;
+        camera.camY -= camera.forwardY*vel;
+        camera.camZ -= camera.forwardZ*vel;
+    }
+    if( key == 'a' )
+    {
+
+        camera.camX -= rightX*vel;
+        camera.camY -= rightY*vel;
+        camera.camZ -= rightZ*vel;
     }
     if( key == 'd' )
     {
-        cx+=vel;
-    }
-    if( key == '+' )
-    {
-        cz+=vel;
-    }
-    if( key == '-' )
-    {
-        cz+=vel;
+        camera.camX += rightX*vel;
+        camera.camY += rightY*vel;
+        camera.camZ += rightZ*vel;
     }
 
-    if( key == 'r')
-    {
-       cx= -200;
-       cy = 100;
-       cz = -500;
-    }
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(cx,cy,cz,0,0,0,0,1,0);
+
 }
+
+void mouseCallback(int x, int y){
+
+
+        camera.phi = M_PI+ (0.5 - (float(x)/WINDOW_W))*M_PI;
+        camera.theta = (0.5 - (float(y)/WINDOW_H))*M_PI; 
+
+
+        //printf("phi: %f theta: %f x: %d y: %d\n",camera.phi, camera.theta, x, y);
+
+        float rightX, rightY, rightZ;
+        rightX = sinf(camera.phi - M_PI/2.0f);
+        rightY = 0;
+        rightZ = cosf(camera.phi - M_PI/2.0f);
+        float sizeRight = sqrtf(rightX*rightX + rightY*rightY + rightZ*rightZ);
+        rightX /= sizeRight; rightY /= sizeRight; rightZ /= sizeRight;
+
+
+        camera.forwardX = cosf(camera.theta)*sinf(camera.phi);
+        camera.forwardY = sinf(camera.theta);
+        camera.forwardZ = cosf(camera.theta)*cosf(camera.phi);
+        float sizeForward = sqrtf(camera.forwardX*camera.forwardX + camera.forwardY*camera.forwardY + camera.forwardZ*camera.forwardZ);
+        camera.forwardX /= sizeForward; camera.forwardY /= sizeForward; camera.forwardZ /= sizeForward;
+
+
+
+        //printf("%f %f %f\n",camera.forwardX, camera.forwardY, camera.forwardZ);
+
+       
+
+        float newUpX, newUpY, newUpZ;
+
+        cross(rightX,rightY,rightZ, camera.forwardX,camera.forwardY, camera.forwardZ, newUpX, newUpY, newUpZ);
+        float sizeUp = sqrtf(newUpX*newUpX + newUpY*newUpY + newUpZ*newUpZ);
+        camera.upX = newUpX/sizeUp; camera.upY = newUpY/sizeUp; camera.upZ = newUpZ/sizeUp;
+        
+
+
+}
+
+void cross(float x1, float y1, float z1, float x2, float y2, float z2,float& rightX, float& rightY, float& rightZ){
+    rightX = y1*z2 - z1*y2;
+    rightY = x1*z2 - x1*z2;
+    rightZ = x1*y2 - y1*x1;
+
+}
+
  
 //utility functions definitions go here
 void draw() {
 
     // Black background
     glClearColor(0.7f,0.7f,0.7f,0.7f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
+              camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
+              camera.upX,camera.upY,camera.upZ); //Camera up direction
 
     runKernelNBodySimulation();
 
@@ -82,8 +158,6 @@ void draw() {
 	//}
 
 
-   glutPostRedisplay();
-
 }
 
 void DrawCircle(float cx, float cy, float r, int num_segments) {
@@ -100,19 +174,36 @@ void DrawCircle(float cx, float cy, float r, int num_segments) {
 
 void draw2(){
     glClearColor(0.7f,0.7f,0.7f,0.7f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glColor3f(0.5f, 0.0f, 1.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
+              camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
+              camera.upX,camera.upY,camera.upZ); //Camera up direction
+
     runKernelNBodySimulation();
 
     for(int i = 0; i < N_SIZE; i ++){
         if(bodies[i].alpha>0)
+        {
+            if( !ORTHO_VERSION) 
+            {
+                glPushMatrix();
+                glTranslatef(bodies[i].pos.x, bodies[i].pos.y,bodies[i].pos.z);
+                glutSolidSphere(bodies[i].radius,10,10);
+                glPopMatrix();
+            }
+
             DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
+        }
+            
+            
     }
 
     glutSwapBuffers();
 
-
-    glutPostRedisplay();
 
 }
 
