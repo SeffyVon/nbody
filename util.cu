@@ -196,7 +196,7 @@ void draw2(){
                 glPopMatrix();
             }
 
-            DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
+            //DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
         }
             
             

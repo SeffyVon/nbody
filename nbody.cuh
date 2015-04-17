@@ -8,7 +8,7 @@
 #include <cmath>
 
 #define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include <GL/glut.h>
 
 
@@ -41,19 +41,35 @@ struct Body {
 
 
 	Body() {
-		pos.x = (-WINDOW_W/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_W) * 0.9;
-		pos.y = (-WINDOW_H/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_H) * 0.9;
-		pos.z = 0.0f ;
-		a.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-		a.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-		a.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 
-		v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-		v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-		v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+		if(ORTHO_VERSION) {
+			pos.x = (-WINDOW_W/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_W) * 0.9;
+			pos.y = (-WINDOW_H/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_H) * 0.9;
+			pos.z = 0.0f ;
+			a.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			a.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			a.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+
+			v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			
+		}
+		else{
+			pos.x = (-WINDOW_W/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_W) * 0.9;
+			pos.y = (-WINDOW_H/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_H) * 0.9;
+			pos.z = (-100 + ((float)rand()/(float)(RAND_MAX)) * 100) * 0.9 ;
+			a.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			a.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			a.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+
+			v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+		}
+		
 		radius = ((float)rand()/(float)(RAND_MAX))*3.0;
 		mass = 4.0/3.0*PI * radius*radius*radius * DENSITY;
-
 		r = 0.5f;
 		g = 1.0f;
 		b = 1.0f;

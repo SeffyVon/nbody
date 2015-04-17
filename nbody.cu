@@ -111,15 +111,14 @@ void initCUDA()
 
 void initGL()
 {
-	
-
+	/*
 	glewInit();
     if (glewIsSupported("GL_VERSION_2_0"))
         printf("Ready for OpenGL 2.0\n");
     else {
         printf("OpenGL 2.0 not supported\n");
         exit(1);
-    }
+    }*/
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);

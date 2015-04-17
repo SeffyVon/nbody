@@ -31,13 +31,13 @@ endif(NOT OPENGL_FOUND)
 #########################################################
 # FIND GLEW
 #########################################################
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-link_directories(${GLEW_LIBRARY_DIRS})
-add_definitions(${GLEW_DEFINITIONS})
-if(NOT GLEW_FOUND)
-    message(ERROR " OPENGL not found!")
-endif(NOT GLEW_FOUND)
+#find_package(GLEW REQUIRED)
+#include_directories(${GLEW_INCLUDE_DIRS})
+#link_directories(${GLEW_LIBRARY_DIRS})
+#add_definitions(${GLEW_DEFINITIONS})
+#if(NOT GLEW_FOUND)
+#    message(ERROR " OPENGL not found!")
+#endif(NOT GLEW_FOUND)
 
 
 # nvcc flags                                                                                                                                                                                               
