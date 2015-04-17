@@ -9,14 +9,15 @@ bool mouseUp = 0;
 
 bool toggleHelp = true;
 
-float lpos[4] = {-0.3,0.0,0.2,0}; //Positioned light
-float light_specular[4] = {1, 0.6, 1, 0};
-GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 0.0 };
-GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 0.0 }; //ambient light intensity
+GLfloat lpos[4] = {-0.3,0.0,200,0}; //Positioned light
+GLfloat light_specular[4] = {1, 0.6, 1, 0}; //specular light intensity (color)
+GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 0.0 };//diffuse light intensity (color)
+GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 0.0 }; //ambient light intensity (color)
 GLfloat a;
-GLfloat mat_emission[] = {0.3, 0.5, 0.7, 0.0};
-GLfloat mat_specular[] = { 1.0, 0.5, 0.0, 0.0 };
-GLfloat low_shininess[] = { 0.5 };
+GLfloat mat_emission[] = {0.8, 0.5, 0.3, 0.0}; //object material preperty emission of light
+GLfloat mat_specular[] = { 4.0, 0.5, 2.0, 0.0 }; //object material specularity
+GLfloat low_shininess[] = { 50 };
+GLfloat fogColor[] = {0.5f, 0.5f, 0.5f, 1};
 
 void timerFunc(int value)
 {
@@ -223,8 +224,27 @@ void drawText(std::string text, float x, float y){
     glPopMatrix();
 }
 
+
+void setLights(){
+
+    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, light_ambient);
+    glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, low_shininess);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    //glLightfv(GL_LIGHT0, GL_SPECULAR, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_POSITION, lpos);
+
+
+    //Adding fog
+    glFogfv(GL_FOG_COLOR, fogColor);
+    glFogi(GL_FOG_MODE, GL_LINEAR);
+    glFogf(GL_FOG_START, 10.0f);
+    glFogf(GL_FOG_END, 1000.0f);
+}
+
 void draw2(){
-    glClearColor(0.7f,0.7f,0.7f,0.7f);
+    glClearColor(0.3f,0.3f,0.3f,0.3f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
 
@@ -235,7 +255,7 @@ void draw2(){
               camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
               camera.upX,camera.upY,camera.upZ); //Camera up direction
     }
-    
+    setLights();
 
     runKernelNBodySimulation();
 
@@ -257,7 +277,7 @@ void draw2(){
     }
     
 
-    glColor3f(0.5f, 0.0f, 1.0f);
+    glColor3f(0.5f, 0.5f, 0.3f);
     for(int i = 0; i < N_SIZE; i ++){
         if(bodies[i].alpha>0)
         {

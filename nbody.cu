@@ -154,6 +154,8 @@ void initGL()
 	//glBufferData(GL_ARRAY_BUFFER, N_SIZE*sizeof(Body), bodies, GL_DYNAMIC_COPY);
 
 	glEnable(GL_DEPTH_TEST);
+
+	glEnable(GL_FOG);
 	
 }
 
