@@ -6,6 +6,8 @@
 extern Body bodies[N_SIZE];
 float prevX = WINDOW_W/2, prevY = WINDOW_H/2;
 
+bool toggleHelp = true;
+
 void timerFunc(int value)
 {
     glutPostRedisplay();
@@ -75,6 +77,12 @@ void keyboardFunc(unsigned char key, int x, int y) {
         camera.camZ += rightZ*vel;
     }
      printf("camX: %f camY: %f camZ: %f\n",camera.camX,camera.camY,camera.camY);
+
+
+    if( key == 'h' )
+    {
+        toggleHelp = !toggleHelp;
+    }
 
 
 }
@@ -208,9 +216,14 @@ void draw2(){
               camera.upX,camera.upY,camera.upZ); //Camera up direction
 
     runKernelNBodySimulation();
-    drawText("INFO", 50,40);
-    drawText("Use keys w, a, s, d to move", 50,50);
-    drawText("Hold mouse+left button to look around", 50,60);
+
+    if( toggleHelp ){
+        drawText("USAGE INFO", 50,60);
+        drawText("Use keys w, a, s, d to move", 50,50);
+        drawText("Hold mouse+left button to look around", 50,40);
+        drawText("Press h to show/hide this help info", 50,30);
+    }
+    
 
     glColor3f(0.5f, 0.0f, 1.0f);
     for(int i = 0; i < N_SIZE; i ++){
