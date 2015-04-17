@@ -29,7 +29,7 @@ const int ORTHO_VERSION=0;
 #define TIME_STEP 0.001f
 //#define DAMPING 0.995f
 #define PI 3.14152926f
-#define DENSITY 100000
+#define DENSITY 1000000
 
 struct Body {
 	float3 pos; // position
@@ -58,14 +58,14 @@ struct Body {
 		else{
 			pos.x = (-WINDOW_W/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_W) * 0.9;
 			pos.y = (-WINDOW_H/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_H) * 0.9;
-			pos.z = (-100 + ((float)rand()/(float)(RAND_MAX)) * 100) * 0.9 ;
-			a.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-			a.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-			a.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			pos.z = (-500 + ((float)rand()/(float)(RAND_MAX)) * 500) * 0.9 ;
+			a.x = -50 + ((float)rand()/(float)(RAND_MAX))*50;
+			a.y = -50 + ((float)rand()/(float)(RAND_MAX))*50;
+			a.z = -50 + ((float)rand()/(float)(RAND_MAX))*50;
 
-			v.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-			v.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
-			v.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
+			v.x = -50 + ((float)rand()/(float)(RAND_MAX))*50;
+			v.y = -50 + ((float)rand()/(float)(RAND_MAX))*50;
+			v.z = -50 + ((float)rand()/(float)(RAND_MAX))*50;
 		}
 		
 		radius = ((float)rand()/(float)(RAND_MAX))*3.0;
