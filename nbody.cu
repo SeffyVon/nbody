@@ -12,7 +12,6 @@ Body *bodies_dev = NULL;
 Body bodies[N_SIZE] = {Body(0, 0, 0, 1.0f) , Body(0,100,0,1.0f)};
 GLuint vertexArray;
 
-GLuint v,f,f2,p;
 
 
 
@@ -43,59 +42,7 @@ void readFromFile2()
   fclose(f_sample);
 }
 
-char* readShaderFromFile(const char* filename){
 
-
-    std::ifstream t;
-    int length;
-    t.open(filename);   
-    t.seekg(0, std::ios::end);    
-    length = t.tellg();           
-    t.seekg(0, std::ios::beg);    
-    char* buffer = new char[length];   
-    t.read(buffer, length);      
-    t.close();
-
-    return buffer;
-
-}
-
-void setShaders() {
-
-    char *vs = NULL,*fs = NULL;
-
-    v = glCreateShader(GL_VERTEX_SHADER);
-    f = glCreateShader(GL_FRAGMENT_SHADER);
-    //f2 = glCreateShader(GL_FRAGMENT_SHADER);
-
-    vs = readShaderFromFile("minimal.vert");
-    fs = readShaderFromFile("minimal.frag");
-
-    const char * vv = vs;
-    const char * ff = fs;
-
-    glShaderSource(v, 1, &vv,NULL);
-    //glShaderSource(f, 1, &ff,NULL);
-
-    free(vs);free(fs);
-
-    glCompileShader(v);
-    glCompileShader(f);
-
-    //printShaderInfoLog(v);
-    //printShaderInfoLog(f);
-    //printShaderInfoLog(f2);
-
-    p = glCreateProgram();
-    glAttachShader(p,v);
-    glAttachShader(p,f);
-
-    glLinkProgram(p);
-    //printProgramInfoLog(p);
-
-    glUseProgram(p);
-
-}
 
 void initCUDA()
 {
@@ -111,14 +58,6 @@ void initCUDA()
 
 void initGL()
 {
-	/*
-	glewInit();
-    if (glewIsSupported("GL_VERSION_2_0"))
-        printf("Ready for OpenGL 2.0\n");
-    else {
-        printf("OpenGL 2.0 not supported\n");
-        exit(1);
-    }*/
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -149,9 +88,7 @@ void initGL()
    		  gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
               camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
               camera.upX,camera.upY,camera.upZ); //Camera up direction
-	//glGenBuffers(1,&vertexArray);
-	//glBindBuffer(GL_ARRAY_BUFFER, vertexArray);
-	//glBufferData(GL_ARRAY_BUFFER, N_SIZE*sizeof(Body), bodies, GL_DYNAMIC_COPY);
+
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -327,23 +264,6 @@ int runKernelNBodySimulation()
 
 	cudaMemcpy( bodies, bodies_dev, bodies_size, cudaMemcpyDeviceToHost ); 
 
-
-	for(int i = 0; i < N_SIZE; i++)
-	{
-		//printf("a[%d]=(%f,%f) ", i, bodies[i].a.x, bodies[i].a.y);
-		//printf("v[%d]=(%f,%f)\n", i, bodies[i].v.x, bodies[i].v.y);
-		//printf("pos[%d]=(%f,%f)\n", i, bodies[i].pos.x, bodies[i].pos.y);
-	}
-
-	// Unmap the buffer
-	//cudaGLUnmapbufferObject(vertexArray);
-	
-	/*
-	for(int i = 0; i < N_SIZE; i++){
-		printf("a=(%f,%f,%f)\n", bodies[i].a.x, bodies[i].a.y, bodies[i].a.z);
-	}*/
-
-	
 
 	return EXIT_SUCCESS;
 }

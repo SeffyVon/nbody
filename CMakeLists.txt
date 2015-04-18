@@ -28,18 +28,6 @@ if(NOT OPENGL_FOUND)
     message(ERROR " OPENGL not found!")
 endif(NOT OPENGL_FOUND)
 
-#########################################################
-# FIND GLEW
-#########################################################
-#find_package(GLEW REQUIRED)
-#include_directories(${GLEW_INCLUDE_DIRS})
-#link_directories(${GLEW_LIBRARY_DIRS})
-#add_definitions(${GLEW_DEFINITIONS})
-#if(NOT GLEW_FOUND)
-#    message(ERROR " OPENGL not found!")
-#endif(NOT GLEW_FOUND)
-
-
 # nvcc flags                                                                                                                                                                                               
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_30,code=sm_30)
 
