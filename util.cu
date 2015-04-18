@@ -157,40 +157,6 @@ void cross(float x1, float y1, float z1, float x2, float y2, float z2,float& rig
 }
 
  
-//utility functions definitions go here
-void draw() {
-
-    // Black background
-    glClearColor(0.7f,0.7f,0.7f,0.7f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
-              camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
-              camera.upX,camera.upY,camera.upZ); //Camera up direction
-
-    runKernelNBodySimulation();
-
- //  glColor3ub( 255, 0, 255 );
-    glEnableClientState( GL_VERTEX_ARRAY );
-    glEnableClientState( GL_COLOR_ARRAY );
-    glVertexPointer( 3, GL_FLOAT, sizeof(Body), &bodies[0].pos.x );
-    glColorPointer( 4, GL_FLOAT, sizeof(Body), &bodies[0].r );
-    glPointSize( 5.0 );
-    glDrawArrays( GL_POINTS, 0, N_SIZE );
-    glDisableClientState( GL_VERTEX_ARRAY );
-    glDisableClientState( GL_COLOR_ARRAY );
-
-   	glutSwapBuffers();
-    
-    //Draw stuff
-   // for(int i = 0; i < N_SIZE; i++){
-	//	printf("HOHO a=(%f,%f,%f)\n", bodies[i].pos.x, bodies[i].pos.y, bodies[i].pos.z);
-	//}
-
-
-}
 
 void DrawCircle(float cx, float cy, float r, int num_segments) {
     glBegin(GL_LINE_LOOP);
