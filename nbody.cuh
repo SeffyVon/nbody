@@ -24,7 +24,7 @@ const int ORTHO_VERSION=0;
 #define GRID_SIZE 1000
 #define SOFT_FACTOR 0.00125f
 
-#define GRAVITACIONAL_CONSTANT 0.01f//0.000667 //9.81f
+#define GRAVITATIONAL_CONSTANT 0.01f//0.000667 //9.81f
 //#define EPSILON2 4.930380657631323783822134085449116758237409e-32// epsilon ^ 2
 #define TIME_STEP 0.001f
 //#define DAMPING 0.995f
@@ -37,8 +37,6 @@ struct Body {
 	float3 v; // velocity
 	float mass; // mass
 	float radius;
-	float r, g, b, alpha; //color
-
 
 	Body() {
 
@@ -70,10 +68,6 @@ struct Body {
 		
 		radius = ((float)rand()/(float)(RAND_MAX))*3.0;
 		mass = 4.0/3.0*PI * radius*radius*radius * DENSITY;
-		r = 0.5f;
-		g = 1.0f;
-		b = 1.0f;
-		alpha = 1.0f;
 
 	}
 
@@ -86,10 +80,6 @@ struct Body {
 		v.x = v.y = v.z = 0.0f;
 		this->radius = radius;
 		this->mass = 4.0/3.0* PI * radius*radius*radius * DENSITY;
-		r = ((float)rand()/(float)(RAND_MAX));
-		g = ((float)rand()/(float)(RAND_MAX));
-		b = ((float)rand()/(float)(RAND_MAX));
-		alpha = 1.0f;
 	}
 
 };
@@ -132,10 +122,6 @@ void initGL();
 
 
 int runKernelNBodySimulation();
-
-//__device__ 
-//void updateAcceleration(Body &body);
-
 
 __device__
 void bodyBodyCollision(Body &self, Body &other, float3 &cur_a);

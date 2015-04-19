@@ -12,46 +12,32 @@ Body *bodies_dev = NULL;
 Body bodies[N_SIZE] = {Body(0, 0, 0, 1.0f) , Body(0,100,0,1.0f)};
 GLuint vertexArray;
 
+__device__
+int icbrt2(unsigned x) {
+   int s;
+   unsigned y, b, y2;
 
-
-
-void readFromFile2()
-{
-	int i = 0;
-
-	FILE* f_sample = fopen("dubinski.tab","r");
-	double mass;
-	double x, y, z, vx, vy, vz;
-	int j = 0;
-	while ( i < N_SIZE && fscanf( f_sample, "%lf %lf %lf %lf %lf %lf %lf", &mass, &x, &y, &z, &vx, &vy, &vz )>0 ){ // the ith element will store in the sample[i+head_blocks_size]
-	    
-		if( j < 1024|| j > 32768 && j < 32768+512 || j > (32768 + 16384) ){
-
-		    bodies[i].mass = (float)mass*10;
-		    bodies[i].pos.x = (float)x;
-		    bodies[i].pos.y = (float)y;
-		    bodies[i].pos.z = (float)z;
-		    bodies[i].v.x = (float)vx*5;
-		    bodies[i].v.y =(float) vy*5;
-		    bodies[i].v.z = (float)vz*5;
-		    i++;
-		}
-		j++;
-
-  }
-  fclose(f_sample);
+   y2 = 0;
+   y = 0;
+   for (s = 30; s >= 0; s = s - 3) {
+      y2 = 4*y2;
+      y = 2*y;
+      b = (3*(y2 + y) + 1) << s;
+      if (x >= b) {
+         x = x - b;
+         y2 = y2 + 2*y + 1;
+         y = y + 1;
+      }
+   }
+   return y;
 }
-
-
 
 void initCUDA()
 {
 
-	//readFromFile2();
 	bodies_size = N_SIZE * sizeof(Body);
 	cudaMalloc( (void**)&bodies_dev, bodies_size ); 
 	cudaMemcpy( bodies_dev, bodies, bodies_size, cudaMemcpyHostToDevice );
-
 	//cudaGLRegisterBufferObject(vertexArray);
 
 }
@@ -143,57 +129,35 @@ __device__
 void bodyBodyCollision(Body &self, Body &other, float3 &cur_a)
 {
 
+	
+	float m = self.mass+other.mass;
+	float3 vertex;
+	vertex.x = (self.v.x * self.mass +other.v.x * other.mass)/m;
+	vertex.y = (self.v.y * self.mass +other.v.y * other.mass)/m;
+	vertex.z = (self.v.z * self.mass +other.v.z * other.mass)/m;
 
-	/*for merging*/
+	float3 zero_vertex;
+	zero_vertex.x = 0.0f;
+	zero_vertex.y = 0.0f;
+	zero_vertex.z = 0.0f;
+
 	if(self.mass>other.mass){
+		self.v = vertex;
+		self.mass = m;
 
-		self.v.x = (self.v.x * self.mass +other.v.x * other.mass)/(self.mass+other.mass);
-		self.v.y = (self.v.y * self.mass +other.v.y * other.mass)/(self.mass+other.mass);
-		self.v.z = (self.v.z * self.mass +other.v.z * other.mass)/(self.mass+other.mass);
-		self.mass += other.mass;
-		self.radius = cbrt(self.mass/ (DENSITY * 4.0/3.0*PI)) ; 
+		other.mass = 0.0f;
+		other.a = zero_vertex;
+		other.v = zero_vertex;
 
-		other.mass = 0.0f; 
-
-		other.a.x = 0.0f;
-		other.a.y = 0.0f;
-		other.a.z = 0.0f;
-
-		other.v.x = 0.0f;
-		other.v.y = 0.0f;
-		other.v.z = 0.0f;
 	}else{
+		other.v = vertex;
+		other.mass = m;
 
-		other.v.x = (self.v.x * self.mass +other.v.x * other.mass)/(self.mass+other.mass);
-		other.v.y = (self.v.y * self.mass +other.v.y * other.mass)/(self.mass+other.mass);
-		other.v.z = (self.v.z * self.mass +other.v.z * other.mass)/(self.mass+other.mass);
-
-		other.mass += self.mass;
-		other.radius = cbrt(other.mass/ (DENSITY * 4.0/3.0*PI)) ; 
-		self.mass = 0.0f; 
-
-		self.a.x = 0.0f;
-		self.a.y = 0.0f;
-		self.a.z = 0.0f;
-
-		self.v.x = 0.0f;
-		self.v.y = 0.0f;
-		self.v.z = 0.0f;
+		self.mass = 0.0f;
+		self.a = zero_vertex;
+		self.v = zero_vertex;
 	}
 
-	//other.alpha = 0.0f;
-	// other.radius = 0;
-
-	//Update alpha value according to the mass (if mass == 0 then alpha is also set to zero, so the body becomes transparent)
-
-	/*no merging*/
-	// other.v.x = self.v.x;
-	// other.v.y = self.v.y;
-	// other.v.z = self.v.z;
-
-	// cur_a.x = 0;
-	// cur_a.y = 0;
-	// cur_a.z = 0;
 }
 
 
@@ -203,6 +167,8 @@ void nbody(Body *body)
 	int idx = blockIdx.x * BLOCK_SIZE + threadIdx.x;
 	if(idx < N_SIZE && body[idx].mass != 0)
 	{
+		float mass_before = body[idx].mass;
+
 		float3 cur_a;
 		cur_a.x = 0 ;
 		cur_a.y = 0 ;
@@ -232,9 +198,9 @@ void nbody(Body *body)
 			}
 		}
 
-		cur_a.x *= GRAVITACIONAL_CONSTANT;
-		cur_a.y *= GRAVITACIONAL_CONSTANT;
-		cur_a.z *= GRAVITACIONAL_CONSTANT;
+		cur_a.x *= GRAVITATIONAL_CONSTANT;
+		cur_a.y *= GRAVITATIONAL_CONSTANT;
+		cur_a.z *= GRAVITATIONAL_CONSTANT;
 		
 		updatePosAndVel(body[idx], cur_a);
 
@@ -242,23 +208,16 @@ void nbody(Body *body)
 		body[idx].a.y = cur_a.y;
 		body[idx].a.z = cur_a.z;
 
-		if(body[idx].radius<2.0f)
-			body[idx].r = body[idx].radius/2.0f;
-	}
-
-	__syncthreads();
-	if( idx < N_SIZE) {
-		
-		if(body[idx].mass == 0.0 )
-			body[idx].alpha = 0.0;
+		if(body[idx].mass != mass_before)
+			body[idx].radius = icbrt2(body[idx].mass/ (DENSITY * 4.0/3.0*PI)); 
 	}
 }
+
 
 
 int runKernelNBodySimulation()
 {
 	// Map the buffer to CUDA
-	//cudaGLMapBufferObject(&bodies_dev, vertexArray);
 
 	nbody<<<GRID_SIZE, BLOCK_SIZE>>>(bodies_dev);
 
