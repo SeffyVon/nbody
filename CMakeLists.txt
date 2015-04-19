@@ -4,7 +4,7 @@ project(test-cuda-thrust-gdb)
 # required cmake version                                                                                                                                                                                   
 cmake_minimum_required(VERSION 2.8)
 
-# packages                                                                                                                                                                                                 
+# packages                                                                                                                                                                                                
 find_package(CUDA REQUIRED)
 
 #########################################################
@@ -38,6 +38,7 @@ set(INC util.cuh
 set(SRC util.cu
 		nbody.cu
 )
+
 
 
 cuda_add_executable(main cuda_main.cu ${SRC} ${INC} )

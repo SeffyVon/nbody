@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     glutReshapeFunc(resizeCallback);
 
 
-
+    // init the CUDA and the OpenGL
     init();
 
     // Loop require by OpenGL

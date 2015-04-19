@@ -8,7 +8,6 @@ Camera camera;
 int bodies_size = 0;
 Body *bodies_dev = NULL;
 
-//ody bodies[N_SIZE]= {  Body(0,0,0,1000000), Body(13,2,0,1000000),  Body(8,3,0,1000000), Body(2,7,0,1000000), Body(7,2,0,1000000), Body(9,2,0,1000000),  Body(4,3,0,1000000), Body(2,4,0,1000000) };
 Body bodies[N_SIZE] = {Body(0, 0, 0, 1.0f) , Body(0,100,0,1.0f)};
 GLuint vertexArray;
 
@@ -38,7 +37,6 @@ void initCUDA()
 	bodies_size = N_SIZE * sizeof(Body);
 	cudaMalloc( (void**)&bodies_dev, bodies_size ); 
 	cudaMemcpy( bodies_dev, bodies, bodies_size, cudaMemcpyHostToDevice );
-	//cudaGLRegisterBufferObject(vertexArray);
 
 }
 
@@ -52,9 +50,7 @@ void initGL()
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 
     glEnable(GL_LIGHT0);
-
     glEnable(GL_COLOR_MATERIAL);
-
 
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -70,18 +66,19 @@ void initGL()
    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
     if( !ORTHO_VERSION )
-   		  gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
-              camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
-              camera.upX,camera.upY,camera.upZ); //Camera up direction
+   		gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
+        camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
+        camera.upX,camera.upY,camera.upZ); //Camera up direction
 
 
 	glEnable(GL_DEPTH_TEST);
-
 	glEnable(GL_FOG);
 	
 }
 
+// init the program
 void init()
 {
 	initGL();
@@ -113,6 +110,9 @@ void updatePosAndVel(Body &body, float3 cur_a)
 	body.v.z = newvz; 
 }
 
+/**
+ * the accelartion on one star if they do not collide
+ */
 __device__
 void bodyBodyInteraction(Body &self, Body &other, float3 &cur_a, float3 dist3, float dist_sqr)
 {
@@ -120,44 +120,50 @@ void bodyBodyInteraction(Body &self, Body &other, float3 &cur_a, float3 dist3, f
 	float dist_six = dist_sqr * dist_sqr * dist_sqr;
 	float dist_cub = sqrtf(dist_six);
 
+	// this is according to the Newton's law of universal gravitaion
 	cur_a.x += (other.mass * dist3.x) / dist_cub;
 	cur_a.y += (other.mass * dist3.y) / dist_cub;
 	cur_a.z += (other.mass * dist3.z) / dist_cub;
 }
 
+/**
+ * the accelartion on one star if they collide
+ */
 __device__
 void bodyBodyCollision(Body &self, Body &other, float3 &cur_a)
 {
-
 	
 	float m = self.mass+other.mass;
-	float3 vertex;
-	vertex.x = (self.v.x * self.mass +other.v.x * other.mass)/m;
-	vertex.y = (self.v.y * self.mass +other.v.y * other.mass)/m;
-	vertex.z = (self.v.z * self.mass +other.v.z * other.mass)/m;
 
-	float3 zero_vertex;
-	zero_vertex.x = 0.0f;
-	zero_vertex.y = 0.0f;
-	zero_vertex.z = 0.0f;
+	// Used perfectly unelastic collision model to caculate the velocity after merging.
+	float3 velocity;
 
-	if(self.mass>other.mass){
-		self.v = vertex;
+	velocity.x = (self.v.x * self.mass +other.v.x * other.mass)/m;
+	velocity.y = (self.v.y * self.mass +other.v.y * other.mass)/m;
+	velocity.z = (self.v.z * self.mass +other.v.z * other.mass)/m;
+
+	float3 zero_float3;
+	zero_float3.x = 0.0f;
+	zero_float3.y = 0.0f;
+	zero_float3.z = 0.0f;
+
+	// the heavier body will remain, but the lighter one will disappear
+	// although here will cause code divergence, the 4 operations are very simple
+	if(self.mass>other.mass)
+	{ 
+		self.v = velocity;
+		other.v = zero_float3;
 		self.mass = m;
-
 		other.mass = 0.0f;
-		other.a = zero_vertex;
-		other.v = zero_vertex;
-
-	}else{
-		other.v = vertex;
-		other.mass = m;
-
-		self.mass = 0.0f;
-		self.a = zero_vertex;
-		self.v = zero_vertex;
 	}
+	else
+	{
+		other.v = velocity;
+		self.v = zero_float3;
+		other.mass = m;
+		self.mass = 0.0f;
 
+	}
 }
 
 
@@ -169,45 +175,56 @@ void nbody(Body *body)
 	{
 		float mass_before = body[idx].mass;
 
+		// initiate the acceleration of the next moment 
 		float3 cur_a;
+
 		cur_a.x = 0 ;
 		cur_a.y = 0 ;
 		cur_a.z = 0 ;
 
+		// for any two body
 		for(int i = 0; i < N_SIZE; i++){
 
 			if( i != idx && body[i].mass!= 0){
 
 				if(body[idx].mass!=0){
 
-					float3 dist3;
+					float3 dist3; // calculate their distance
 
 					dist3.x = body[i].pos.x - body[idx].pos.x;
 					dist3.y = body[i].pos.y - body[idx].pos.y;
 					dist3.z = body[i].pos.z - body[idx].pos.z;
 
+					// update the force between two non-empty bodies
 					float dist_sqr = dist3.x * dist3.x + dist3.y * dist3.y + dist3.z * dist3.z + SOFT_FACTOR;
 
-					if( sqrt(dist_sqr) > body[idx].radius + body[i].radius )
+					// if they depart
+					if( sqrt(dist_sqr) > body[idx].radius + body[i].radius ) 
 						bodyBodyInteraction(body[idx], body[i], cur_a, dist3, dist_sqr);
-					else{
+
+					// if they overlap
+					else 
 						bodyBodyCollision(body[idx], body[i], cur_a);	
-					}
+					
 
 				}
 			}
 		}
 
+		// multiplies a Gravitational Constant
 		cur_a.x *= GRAVITATIONAL_CONSTANT;
 		cur_a.y *= GRAVITATIONAL_CONSTANT;
 		cur_a.z *= GRAVITATIONAL_CONSTANT;
 		
+		//update the position and velocity
 		updatePosAndVel(body[idx], cur_a);
 
+		// update the body acceleration
 		body[idx].a.x = cur_a.x;
 		body[idx].a.y = cur_a.y;
 		body[idx].a.z = cur_a.z;
 
+		// if the mass is changed, update the radius
 		if(body[idx].mass != mass_before)
 			body[idx].radius = icbrt2(body[idx].mass/ (DENSITY * 4.0/3.0*PI)); 
 	}

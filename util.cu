@@ -6,7 +6,6 @@
 extern Body bodies[N_SIZE];
 float prevX = WINDOW_W/2, prevY = WINDOW_H/2;
 bool mouseUp = 0;
-
 bool toggleHelp = true;
 
 GLfloat lpos[4] = {-0.3,0.0,200,0}; //Positioned light
@@ -58,33 +57,33 @@ void keyboardFunc(unsigned char key, int x, int y) {
     float sizeRight = sqrtf(rightX*rightX + rightY*rightY + rightZ*rightZ);
     rightX /= sizeRight; rightY /= sizeRight; rightZ /= sizeRight;
 
-    if( key == 'w' )
+    if( key == 'w' ) // move forward
     {
         camera.camX += camera.forwardX*vel;
         camera.camY += camera.forwardY*vel;
         camera.camZ += camera.forwardZ*vel;
     }
-    if( key == 's' )
+    if( key == 's' ) // move backward
     {
         camera.camX -= camera.forwardX*vel;
         camera.camY -= camera.forwardY*vel;
         camera.camZ -= camera.forwardZ*vel;
     }
-    if( key == 'a' )
+    if( key == 'a' ) // move left
     {
 
         camera.camX -= rightX*vel;
         camera.camY -= rightY*vel;
         camera.camZ -= rightZ*vel;
     }
-    if( key == 'd' )
+    if( key == 'd' ) // move right
     {
         camera.camX += rightX*vel;
         camera.camY += rightY*vel;
         camera.camZ += rightZ*vel;
     }
 
-    if( key == 'h' )
+    if( key == 'h' ) // show or hide help
     {
         toggleHelp = !toggleHelp;
     }
@@ -95,6 +94,8 @@ void PassiveMouseMotion( int x, int y ){
     prevX = x, prevY = y;
 
 }
+
+// call back function triggered by mouse
 void mouseCallback(int x, int y){
 
         float velx = (float(x -prevX)/WINDOW_W);
@@ -228,15 +229,13 @@ void draw2(){
             {
                 glPushMatrix();
                 glTranslatef(bodies[i].pos.x, bodies[i].pos.y,bodies[i].pos.z);
-                glutSolidSphere(bodies[i].radius,10,10);
+                glutSolidSphere(bodies[i].radius,10,10); // draw sphere
                 glPopMatrix();
             }
             else{
-
-                DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
+                DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10); // draw circle
             }
         }
-            
             
     }
 

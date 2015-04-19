@@ -14,7 +14,7 @@
 
 #include <cuda_gl_interop.h>
 
-const int ORTHO_VERSION=0;
+const int ORTHO_VERSION=0; // 1 is 2D version, 0 is 3D version.
 
 #define WINDOW_W 1920
 #define WINDOW_H 1080
@@ -24,10 +24,8 @@ const int ORTHO_VERSION=0;
 #define GRID_SIZE 1000
 #define SOFT_FACTOR 0.00125f
 
-#define GRAVITATIONAL_CONSTANT 0.01f//0.000667 //9.81f
-//#define EPSILON2 4.930380657631323783822134085449116758237409e-32// epsilon ^ 2
+#define GRAVITATIONAL_CONSTANT 0.01f
 #define TIME_STEP 0.001f
-//#define DAMPING 0.995f
 #define PI 3.14152926f
 #define DENSITY 1000000
 
@@ -38,12 +36,14 @@ struct Body {
 	float mass; // mass
 	float radius;
 
+	// default initialization
 	Body() {
 
 		if(ORTHO_VERSION) {
 			pos.x = (-WINDOW_W/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_W) * 0.9;
 			pos.y = (-WINDOW_H/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_H) * 0.9;
 			pos.z = 0.0f ;
+
 			a.x = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 			a.y = -5 + ((float)rand()/(float)(RAND_MAX))*10;
 			a.z = -5 + ((float)rand()/(float)(RAND_MAX))*10;
@@ -57,6 +57,7 @@ struct Body {
 			pos.x = (-WINDOW_W/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_W) * 0.9;
 			pos.y = (-WINDOW_H/2 + ((float)rand()/(float)(RAND_MAX)) * WINDOW_H) * 0.9;
 			pos.z = (-500 + ((float)rand()/(float)(RAND_MAX)) * 500) * 0.9 ;
+
 			a.x = -50 + ((float)rand()/(float)(RAND_MAX))*50;
 			a.y = -50 + ((float)rand()/(float)(RAND_MAX))*50;
 			a.z = -50 + ((float)rand()/(float)(RAND_MAX))*50;
@@ -71,13 +72,15 @@ struct Body {
 
 	}
 
-
+	// initialization with parameters
 	Body(float x, float y, float z, float radius){
 		pos.x = x;
 		pos.y = y;
 		pos.z = z;
+
 		a.x = a.y = a.z = 0.0f;
 		v.x = v.y = v.z = 0.0f;
+
 		this->radius = radius;
 		this->mass = 4.0/3.0* PI * radius*radius*radius * DENSITY;
 	}
@@ -111,8 +114,6 @@ extern GLuint vertexArray;
 extern float cx,cy,cz;
 
  
-
-
 void init();
 void deinit();
 
