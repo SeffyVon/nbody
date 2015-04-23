@@ -216,8 +216,8 @@ void bodyBodyCollision(float m[], float3 vel[], float3 acc[], int self, int othe
 	zero_float3.y = 0.0f;
 	zero_float3.z = 0.0f;
 
-	acc[self] = zero_float3;
-	acc[other] = zero_float3;
+	//acc[self] = zero_float3;
+	//acc[other] = zero_float3;
 
 	// the heavier body will remain, but the lighter one will disappear
 	// although here will cause code divergence, the 4 operations are very simple

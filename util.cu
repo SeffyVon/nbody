@@ -3,10 +3,15 @@
 
 #include <string>
 
-extern Body bodies[N_SIZE];
 float prevX = WINDOW_W/2, prevY = WINDOW_H/2;
 bool mouseUp = 0;
 bool toggleHelp = true;
+
+extern float3 pos[N_SIZE];
+extern float3 vel[N_SIZE];
+extern float3 acc[N_SIZE];
+extern float m[N_SIZE];
+extern float r[N_SIZE];
 
 GLfloat lpos[4] = {-0.3,0.0,200,0}; //Positioned light
 GLfloat light_specular[4] = {1, 0.6, 1, 0}; //specular light intensity (color)
@@ -223,17 +228,17 @@ void draw2(){
 
     glColor3f(0.5f, 0.5f, 0.3f);
     for(int i = 0; i < N_SIZE; i ++){
-        if(bodies[i].mass>0)
+        if(m[i]>0)
         {
             if( !ORTHO_VERSION ) 
             {
                 glPushMatrix();
-                glTranslatef(bodies[i].pos.x, bodies[i].pos.y,bodies[i].pos.z);
-                glutSolidSphere(bodies[i].radius,10,10); // draw sphere
+                glTranslatef(pos[i].x, pos[i].y,pos[i].z);
+                glutSolidSphere(r[i],10,10); // draw sphere
                 glPopMatrix();
             }
             else{
-                DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10); // draw circle
+                DrawCircle(pos[i].x, pos[i].y, r[i], 10); // draw circle
             }
         }
             
