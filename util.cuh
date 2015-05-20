@@ -2,15 +2,21 @@
 #define _UTIL_
 
 
+//utility functions declarations go here
 
+// defined the key board function
 void keyboardFunc(unsigned char key, int x, int y);
+
+// defined call back function triggered by mouse
 void mouseCallback(int x, int y);
+
+// defined callback function for resizing the view
 void resizeCallback(int w, int h);
+
+// for the last mouse motion
 void PassiveMouseMotion( int x, int y );
 
 void timerFunc(int value);
-//utility functions declarations go here
-void draw(void);
 
 void draw2(void);
 

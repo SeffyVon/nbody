@@ -2,8 +2,6 @@
 #include "nbody.cuh"
 #include <iostream>
 #include <fstream>
-extern Body bodies[N_SIZE];
-
 
 //Main program
 int main(int argc, char **argv) {
@@ -24,7 +22,7 @@ int main(int argc, char **argv) {
     glutInitWindowSize(WINDOW_W,WINDOW_H);
 
     //Create Window
-    glutCreateWindow("NBody Simulation - Little Hamster and Sheep");
+    glutCreateWindow("NBody Simulation");
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_BLEND );
@@ -41,7 +39,7 @@ int main(int argc, char **argv) {
     glutReshapeFunc(resizeCallback);
 
 
-
+    // init the CUDA and the OpenGL
     init();
 
     // Loop require by OpenGL

@@ -4,9 +4,8 @@ project(test-cuda-thrust-gdb)
 # required cmake version                                                                                                                                                                                   
 cmake_minimum_required(VERSION 2.8)
 
-# packages                                                                                                                                                                                                 
+# packages                                                                                                                                                                                                
 find_package(CUDA REQUIRED)
-
 #########################################################
 # FIND GLUT
 #########################################################
@@ -49,7 +48,6 @@ set(GENCODE_FLAGS ${GENCODE_SM10} ${GENCODE_SM13} ${GENCODE_SM20} ${GENCODE_SM30
 # nvcc flags                                                                                                                                                                                               
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${GENCODE_FLAGS})
 
-
 set(INC util.cuh
 		nbody.cuh
 )
@@ -57,7 +55,12 @@ set(SRC util.cu
 		nbody.cu
 )
 
+set(BENINC util.cuh
+		   nbody.cuh
+)
 
 cuda_add_executable(main cuda_main.cu ${SRC} ${INC} )
+cuda_add_executable(benchmark benchmark.cu ${SRC} ${BENINC})
 
 target_link_libraries(main ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+target_link_libraries(benchmark ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})

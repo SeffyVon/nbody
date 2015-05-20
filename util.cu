@@ -3,11 +3,15 @@
 
 #include <string>
 
-extern Body bodies[N_SIZE];
 float prevX = WINDOW_W/2, prevY = WINDOW_H/2;
 bool mouseUp = 0;
-
 bool toggleHelp = true;
+
+extern float3 pos[N_SIZE];
+extern float3 vel[N_SIZE];
+extern float3 acc[N_SIZE];
+extern float m[N_SIZE];
+extern float r[N_SIZE];
 
 GLfloat lpos[4] = {-0.3,0.0,200,0}; //Positioned light
 GLfloat light_specular[4] = {1, 0.6, 1, 0}; //specular light intensity (color)
@@ -22,8 +26,6 @@ GLfloat fogColor[] = {0.5f, 0.5f, 0.5f, 1};
 void timerFunc(int value)
 {
     glutPostRedisplay();
-    //glutTimerFunc (1, timerFunc, 10);
-    
 }
 
 void resizeCallback(int w, int h) {
@@ -56,41 +58,37 @@ void keyboardFunc(unsigned char key, int x, int y) {
 
     float vel = 5.0;
     float rightX, rightY, rightZ;
-    //printf("forwardX: %f forwardY: %f forwardZ: %f\n",camera.forwardX,camera.forwardY,camera.forwardZ);
-    //printf("upX: %f upY: %f upZ: %f\n", camera.upX,camera.upY, camera.upZ);
     cross(camera.forwardX,camera.forwardY,camera.forwardZ, camera.upX,camera.upY, camera.upZ, rightX, rightY, rightZ);
     float sizeRight = sqrtf(rightX*rightX + rightY*rightY + rightZ*rightZ);
     rightX /= sizeRight; rightY /= sizeRight; rightZ /= sizeRight;
-    //printf("rightX: %f rightY: %f rightZ: %f\n",rightX, rightY, rightZ);
-    if( key == 'w' )
+
+    if( key == 'w' ) // move forward
     {
         camera.camX += camera.forwardX*vel;
         camera.camY += camera.forwardY*vel;
         camera.camZ += camera.forwardZ*vel;
     }
-    if( key == 's' )
+    if( key == 's' ) // move backward
     {
         camera.camX -= camera.forwardX*vel;
         camera.camY -= camera.forwardY*vel;
         camera.camZ -= camera.forwardZ*vel;
     }
-    if( key == 'a' )
+    if( key == 'a' ) // move left
     {
 
         camera.camX -= rightX*vel;
         camera.camY -= rightY*vel;
         camera.camZ -= rightZ*vel;
     }
-    if( key == 'd' )
+    if( key == 'd' ) // move right
     {
         camera.camX += rightX*vel;
         camera.camY += rightY*vel;
         camera.camZ += rightZ*vel;
     }
-     printf("camX: %f camY: %f camZ: %f\n",camera.camX,camera.camY,camera.camY);
 
-
-    if( key == 'h' )
+    if( key == 'h' ) // show or hide help
     {
         toggleHelp = !toggleHelp;
     }
@@ -101,13 +99,9 @@ void PassiveMouseMotion( int x, int y ){
     prevX = x, prevY = y;
 
 }
+
+// call back function triggered by mouse
 void mouseCallback(int x, int y){
-
-
-        //camera.phi += (0.5 - (float(x)/WINDOW_W))*M_PI*0.015;
-        //camera.theta += (0.5 - (float(y)/WINDOW_H))*M_PI*0.015;
-
-        
 
         float velx = (float(x -prevX)/WINDOW_W);
         float vely = (float(y -prevY)/WINDOW_H);
@@ -115,9 +109,6 @@ void mouseCallback(int x, int y){
         prevY = y;
         camera.phi += -velx*M_PI*0.9;
         camera.theta += -vely*M_PI*0.9;
-
-
-        //printf("phi: %f theta: %f x: %d y: %d\n",camera.phi, camera.theta, x, y);
 
         float rightX, rightY, rightZ;
         rightX = sinf(camera.phi - M_PI/2.0f);
@@ -130,14 +121,9 @@ void mouseCallback(int x, int y){
         camera.forwardX = cosf(camera.theta)*sinf(camera.phi);
         camera.forwardY = sinf(camera.theta);
         camera.forwardZ = cosf(camera.theta)*cosf(camera.phi);
+
         float sizeForward = sqrtf(camera.forwardX*camera.forwardX + camera.forwardY*camera.forwardY + camera.forwardZ*camera.forwardZ);
         camera.forwardX /= sizeForward; camera.forwardY /= sizeForward; camera.forwardZ /= sizeForward;
-
-
-
-        //printf("%f %f %f\n",camera.forwardX, camera.forwardY, camera.forwardZ);
-
-       
 
         float newUpX, newUpY, newUpZ;
 
@@ -157,40 +143,6 @@ void cross(float x1, float y1, float z1, float x2, float y2, float z2,float& rig
 }
 
  
-//utility functions definitions go here
-void draw() {
-
-    // Black background
-    glClearColor(0.7f,0.7f,0.7f,0.7f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(camera.camX,camera.camY,camera.camZ, //Camera position
-              camera.camX+camera.forwardX,camera.camY+camera.forwardY,camera.camZ+camera.forwardZ, //Position of the object to look at
-              camera.upX,camera.upY,camera.upZ); //Camera up direction
-
-    runKernelNBodySimulation();
-
- //  glColor3ub( 255, 0, 255 );
-    glEnableClientState( GL_VERTEX_ARRAY );
-    glEnableClientState( GL_COLOR_ARRAY );
-    glVertexPointer( 3, GL_FLOAT, sizeof(Body), &bodies[0].pos.x );
-    glColorPointer( 4, GL_FLOAT, sizeof(Body), &bodies[0].r );
-    glPointSize( 5.0 );
-    glDrawArrays( GL_POINTS, 0, N_SIZE );
-    glDisableClientState( GL_VERTEX_ARRAY );
-    glDisableClientState( GL_COLOR_ARRAY );
-
-   	glutSwapBuffers();
-    
-    //Draw stuff
-   // for(int i = 0; i < N_SIZE; i++){
-	//	printf("HOHO a=(%f,%f,%f)\n", bodies[i].pos.x, bodies[i].pos.y, bodies[i].pos.z);
-	//}
-
-
-}
 
 void DrawCircle(float cx, float cy, float r, int num_segments) {
     glBegin(GL_LINE_LOOP);
@@ -206,19 +158,17 @@ void DrawCircle(float cx, float cy, float r, int num_segments) {
 void drawText(std::string text, float x, float y){
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    //glLoadIdentity();
+
 
     glColor3f(1.0f, 0.0f, 0.0f);//needs to be called before RasterPos
     glRasterPos2f(x, y);
-    //glScalef(10,10,10);
+
     
     void * font = GLUT_BITMAP_TIMES_ROMAN_24;
 
     for (std::string::iterator i = text.begin(); i != text.end(); ++i)
     {
         char c = *i;
-        //this does nothing, color is fixed for Bitmaps when calling glRasterPos
-        //glColor3f(1.0, 0.0, 1.0); 
         glutBitmapCharacter(font, c);
     }
     glPopMatrix();
@@ -227,12 +177,11 @@ void drawText(std::string text, float x, float y){
 
 void setLights(){
 
-    //glLightModelfv(GL_LIGHT_MODEL_AMBIENT, light_ambient);
+
     glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, low_shininess);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    //glLightfv(GL_LIGHT0, GL_SPECULAR, light_diffuse);
     glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 
 
@@ -264,36 +213,34 @@ void draw2(){
         {
             drawText("USAGE INFO", 50,60);
             drawText("Use keys w, a, s, d to move", 50,50);
-            drawText("Hold mouse+left button to look around", 50,40);
+            drawText("Hold the left button on the mouse to look around", 50,40);
             drawText("Press h to show/hide this help info", 50,30);
         }
         else
         {
             drawText("USAGE INFO", 50,80);
-            drawText("Use keys w, a, s, d to move", 50,60);
-            drawText("Hold mouse+left button to look around", 50,40);
-            drawText("Press h to show/hide this help info", 50,10);
+            drawText("Use keys W, A, S, D to move", 50,60);
+            drawText("Hold the left button on the mouse to look around", 50,40);
+            drawText("Press H to show/hide this help info", 50,10);
         }
     }
     
 
     glColor3f(0.5f, 0.5f, 0.3f);
     for(int i = 0; i < N_SIZE; i ++){
-        if(bodies[i].alpha>0)
+        if(m[i]>0)
         {
             if( !ORTHO_VERSION ) 
             {
                 glPushMatrix();
-                glTranslatef(bodies[i].pos.x, bodies[i].pos.y,bodies[i].pos.z);
-                glutSolidSphere(bodies[i].radius,10,10);
+                glTranslatef(pos[i].x, pos[i].y,pos[i].z);
+                glutSolidSphere(r[i],10,10); // draw sphere
                 glPopMatrix();
             }
             else{
-
-                DrawCircle(bodies[i].pos.x, bodies[i].pos.y, bodies[i].radius, 10);
+                DrawCircle(pos[i].x, pos[i].y, r[i], 10); // draw circle
             }
         }
-            
             
     }
 
