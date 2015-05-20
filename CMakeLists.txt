@@ -39,9 +39,15 @@ endif(NOT OPENGL_FOUND)
 #    message(ERROR " OPENGL not found!")
 #endif(NOT GLEW_FOUND)
 
+set(GENCODE_SM10 -gencode arch=compute_10,code=sm_10 -gencode arch=compute_11,code=sm_11)
+set(GENCODE_SM13 -gencode arch=compute_13,code=sm_13)
+set(GENCODE_SM20 -gencode arch=compute_20,code=sm_20)
+set(GENCODE_SM30 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=sm_35)
+
+set(GENCODE_FLAGS ${GENCODE_SM10} ${GENCODE_SM13} ${GENCODE_SM20} ${GENCODE_SM30})
 
 # nvcc flags                                                                                                                                                                                               
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_30,code=sm_30)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${GENCODE_FLAGS})
 
 
 set(INC util.cuh
