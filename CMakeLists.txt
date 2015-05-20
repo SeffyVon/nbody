@@ -46,7 +46,7 @@ set(GENCODE_SM30 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,co
 set(GENCODE_FLAGS ${GENCODE_SM10} ${GENCODE_SM13} ${GENCODE_SM20} ${GENCODE_SM30})
 
 # nvcc flags                                                                                                                                                                                               
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};${GENCODE_FLAGS})
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} ${GENCODE_FLAGS})
 
 set(INC util.cuh
 		nbody.cuh
